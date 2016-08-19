@@ -791,6 +791,11 @@ close_conn(int sd)
 	if (idx == -1)
 		return;
 
+	if (svr_conn[idx]->cn_active == FromClientDIS
+		|| svr_conn[idx]->cn_active == ToServerDIS) {
+		DIS_tcp_release(sd);
+	}
+
 	if (svr_conn[idx]->cn_active != ChildPipe) {
 		if (CS_close_socket(sd) != CS_SUCCESS) {
 
@@ -846,6 +851,13 @@ cleanup_conn(int idx)
 
 	/* Remove connection from the linked list */
 	delete_link(&svr_conn[idx]->cn_link);
+
+	
+#if defined(PBS_SECURITY) && (PBS_SECURITY == KRB5)
+	svr_conn[idx]->cn_physhost[0] = '\0';
+	free(svr_conn[idx]->cn_principal);
+	svr_conn[idx]->cn_principal = NULL;
+#endif
 
 	/* Free the connection memory */
 	free(svr_conn[idx]);

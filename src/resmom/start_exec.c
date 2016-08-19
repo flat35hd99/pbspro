@@ -96,6 +96,8 @@
 #include "placementsets.h"
 #include "pbs_internal.h"
 
+#include "renew.h"
+
 
 #define EXTRA_ENV_PTRS	       32
 
@@ -2400,6 +2402,10 @@ finish_exec(job *pjob)
 		(void)close(upfds2);
 		(void)close(downfds2);
 
+#if defined(PBS_SECURITY) && (PBS_SECURITY == KRB5)
+		DIS_tcp_setup(jsmpipe[0]);
+#endif     
+                
 		/* add the pipe to the connection table so we can poll it */
 
 		if ((conn = add_conn(jsmpipe[0], ChildPipe, (pbs_net_t)0,
@@ -2618,6 +2624,11 @@ finish_exec(job *pjob)
 		log_err(ENOMEM, __func__, "out of memory");
 		starter_return(upfds, downfds, JOB_EXEC_FAIL1, &sjr);
 	}
+	
+#if defined(PBS_SECURITY) && (PBS_SECURITY == KRB5)
+        if (start_renewal(ptask,pipe_script[0],pipe_script[1]) != PBSGSS_OK)
+            starter_return(upfds, downfds, JOB_EXEC_FAIL_KRB5, &sjr);
+#endif
 
 	/*  First variables from the local environment */
 
@@ -3837,6 +3848,11 @@ start_process(task *ptask, char **argv, char **envp, bool nodemux)
 	if (vtable.v_envp == NULL) {
 		return PBSE_SYSTEM;
 	}
+	
+#if defined(PBS_SECURITY) && (PBS_SECURITY == KRB5)
+	if (start_renewal(ptask,kid_write,kid_read) != PBSGSS_OK)
+		starter_return(kid_write, kid_read, JOB_EXEC_FAIL_KRB5, &sjr);
+#endif
 
 	/* First variables from the local environment */
 	for (j = 0; j < num_var_env; ++j)
@@ -5887,7 +5903,11 @@ catchinter(int sig)
 		return;
 	if (pid == writerpid) {
 		kill(shellpid, SIGKILL);
+#if defined(PBS_SECURITY) && (PBS_SECURITY == KRB5)
+		waitpid(shellpid, &status, WNOHANG);
+#else
 		(void)wait(&status);
+#endif
 		mom_reader_go = 0;
 		x11_reader_go = 0;
 	}
