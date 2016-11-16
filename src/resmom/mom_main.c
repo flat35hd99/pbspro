@@ -200,6 +200,7 @@ char           *mom_home;
 char		mom_host[PBS_MAXHOSTNAME+1];
 pid_t		mom_pid;
 int		mom_run_state = 1;
+int		mom_safe_stop = 0;
 char		mom_short_name[PBS_MAXHOSTNAME+1];
 int		next_sample_time = MAX_CHECK_POLL_TIME;
 int		max_check_poll = MAX_CHECK_POLL_TIME;
@@ -663,6 +664,7 @@ extern  void    scan_for_terminated(void);
 /* Local public functions */
 
 void stop_me(int);
+void safe_stop(int);
 #endif
 
 extern	void	cleanup_hooks_workdir(struct work_task *);
@@ -9114,6 +9116,9 @@ main(int argc, char *argv[])
 	act.sa_handler = toolong;	/* handle an alarm call */
 	sigaction(SIGALRM, &act, NULL);
 
+	act.sa_handler = safe_stop;	/* shutdown only if no multinode jobs */
+	sigaction(SIGUSR1, &act, NULL);
+        
 	act.sa_handler = stop_me;	/* shutdown for these */
 	sigaction(SIGINT, &act, NULL);
 	sigaction(SIGTERM, &act, NULL);
@@ -9135,7 +9140,7 @@ main(int argc, char *argv[])
 	 **	that is exec'ed will not have SIG_IGN set for anything.
 	 */
 	sigaction(SIGPIPE, &act, NULL);
-	sigaction(SIGUSR1, &act, NULL);
+	/* sigaction(SIGUSR1, &act, NULL); */
 #ifdef	SIGINFO
 	sigaction(SIGINFO, &act, NULL);
 #endif
@@ -9733,6 +9738,10 @@ main(int argc, char *argv[])
 		if (call_hup != HUP_CLEAR) {
 			process_hup();
 			internal_state_update = UPDATE_MOM_STATE;
+		}
+                
+		if (mom_safe_stop) {
+                    safe_stop(SIGUSR1);
 		}
 #endif
 
@@ -10602,6 +10611,51 @@ stop_me(int sig)
 	mom_run_state = 0;
 	if (sig == SIGTERM)
 		kill_jobs_on_exit = 1;
+}
+
+/**
+ * @brief
+ *	signal handler for SIGQUIT
+ *	quit only if no multinode jobs on node
+ *	do not kill jobs on exit
+ *
+ * @param[in] sig - signal number
+ *
+ * @return 	Void
+ *
+ */
+
+void
+safe_stop(int sig)
+{
+	sprintf(log_buffer, "caught signal %d", sig);
+	log_event(PBSEVENT_SYSTEM | PBSEVENT_FORCE, PBS_EVENTCLASS_SERVER,
+		LOG_NOTICE, msg_daemonname, log_buffer);
+
+        switch (sig) {
+		case SIGUSR1:
+			mom_run_state = 0;
+			mom_safe_stop = 1;
+			job *pjob;
+			for (pjob = (job *)GET_NEXT(svr_alljobs);
+				pjob;
+				pjob = (job *)GET_NEXT(pjob->ji_alljobs)) {
+				if (pjob->ji_qs.ji_state == JOB_STATE_RUNNING) {
+					if (pjob->ji_numnodes > 1) {
+						mom_run_state = 1;
+					} 
+				}
+
+				if (pjob->ji_qs.ji_state != JOB_STATE_RUNNING) {
+					mom_run_state = 1;
+				}
+			}                    
+			return;
+		default:
+			break;
+	}
+	
+
 }
 #endif	/* WIN32 */
 
