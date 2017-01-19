@@ -220,7 +220,7 @@ query_server(status *pol, int pbs_sd)
 
 	if( query_server_dyn_res(sinfo) == -1 ) {
 		pbs_statfree(server);
-		sinfo -> fairshare = NULL;
+		sinfo -> fairshares = NULL;
 		free_server( sinfo, 0 );
 		return NULL;
 	}
@@ -237,7 +237,7 @@ query_server(status *pol, int pbs_sd)
 			log_buffer);
 		pbs_statfree(server);
 		pbs_statfree(all_sched);
-		sinfo->fairshare = NULL;
+		sinfo->fairshares = NULL;
 		free_server(sinfo, 0);
 		return NULL;
 	}
@@ -248,7 +248,7 @@ query_server(status *pol, int pbs_sd)
 		snprintf(log_buffer, sizeof(log_buffer), "Scheduler does not contain a partition");
 		schdlog(PBSEVENT_SCHED, PBS_EVENTCLASS_SERVER, LOG_ERR, __func__, log_buffer);
 		pbs_statfree(server);
-		sinfo->fairshare = NULL;
+		sinfo->fairshares = NULL;
 		free_server(sinfo, 0);
 		return NULL;
 	}
@@ -265,7 +265,7 @@ query_server(status *pol, int pbs_sd)
 	/* get the nodes, if any - NOTE: will set sinfo -> num_nodes */
 	if ((sinfo->nodes = query_nodes(pbs_sd, sinfo)) == NULL) {
 		pbs_statfree(server);
-		sinfo->fairshare = NULL;
+		sinfo->fairshares = NULL;
 		free_server(sinfo, 0);
 		return NULL;
 	}
@@ -278,7 +278,7 @@ query_server(status *pol, int pbs_sd)
 	/* get the queues */
 	if ((sinfo->queues = query_queues(policy, pbs_sd, sinfo)) == NULL) {
 		pbs_statfree(server);
-		sinfo->fairshare = NULL;
+		sinfo->fairshares = NULL;
 		free_server(sinfo, 0);
 		return NULL;
 	}
@@ -319,7 +319,7 @@ query_server(status *pol, int pbs_sd)
 		for (i = 0; i < sinfo->num_queues; i++) {
 			ret_val = add_queue_to_list(&sinfo->queue_list, sinfo->queues[i]);
 			if (ret_val == 0) {
-				sinfo->fairshare = NULL;
+				sinfo->fairshares = NULL;
 				free_server(sinfo, 1);
 				return NULL;
 			}
@@ -330,7 +330,7 @@ query_server(status *pol, int pbs_sd)
 	sinfo->resvs = query_reservations(sinfo, bs_resvs);
 
 	if (create_server_arrays(sinfo) == 0) { /* bad stuff happened */
-		sinfo->fairshare = NULL;
+		sinfo->fairshares = NULL;
 		free_server(sinfo, 1);
 		return NULL;
 	}
@@ -362,7 +362,7 @@ query_server(status *pol, int pbs_sd)
 	sinfo->exiting_jobs = resource_resv_filter(sinfo->jobs,
 		sinfo->sc.total, check_exit_job, NULL, 0);
 	if (sinfo->running_jobs == NULL || sinfo->exiting_jobs ==NULL) {
-		sinfo->fairshare = NULL;
+		sinfo->fairshares = NULL;
 		free_server(sinfo, 1);
 		return NULL;
 	}
@@ -427,7 +427,7 @@ query_server(status *pol, int pbs_sd)
 
 	sinfo->unordered_nodes = malloc((sinfo->num_nodes+1) * sizeof(node_info*));
 	if(sinfo->unordered_nodes == NULL) {
-		sinfo->fairshare = NULL;
+		sinfo->fairshares = NULL;
 		free_server(sinfo, 1);
 		return NULL;
 	}
@@ -669,7 +669,7 @@ query_server_info(status *pol, struct batch_status *server)
 	 * copy in the global fairshare tree root.  Be careful to not free it
 	 * at the end of the cycle.
 	 */
-	sinfo->fairshare = conf.fairshare;
+	sinfo->fairshares = conf.fairshares;
 #ifdef NAS /* localmod 034 */
 	site_set_share_head(sinfo);
 #endif /* localmod 034 */
@@ -1055,8 +1055,8 @@ free_server_info(server_info *sinfo)
 		free_event_list(sinfo->calendar);
 	if (sinfo->policy != NULL)
 		free_status(sinfo->policy);
-	if (sinfo->fairshare != NULL)
-		free_fairshare_head(sinfo->fairshare);
+	if (sinfo->fairshares != NULL)
+		free_fairshares(sinfo->fairshares);
 	if (sinfo->liminfo != NULL) {
 		lim_free_liminfo(sinfo->liminfo);
 		sinfo->liminfo = NULL;
@@ -1219,7 +1219,7 @@ new_server_info(int limallocflag)
 	sinfo->qrun_job = NULL;
 	sinfo->job_formula = NULL;
 	sinfo->policy = NULL;
-	sinfo->fairshare = NULL;
+	sinfo->fairshares = NULL;
 	sinfo->equiv_classes = NULL;
 	sinfo->buckets = NULL;
 	sinfo->unordered_nodes = NULL;
@@ -2156,9 +2156,9 @@ dup_server_info(server_info *osinfo)
 	if ((nsinfo = new_server_info(0)) == NULL)
 		return NULL;                /* error */
 
-	if (osinfo->fairshare != NULL) {
-		nsinfo->fairshare = dup_fairshare_head(osinfo->fairshare);
-		if (nsinfo->fairshare == NULL) {
+	if (osinfo->fairshares != NULL) {
+		nsinfo->fairshares = dup_fairshares(osinfo->fairshares);
+		if (nsinfo->fairshares == NULL) {
 			free_server(nsinfo, 1);
 			return NULL;
 		}
@@ -2244,7 +2244,7 @@ dup_server_info(server_info *osinfo)
 		for (i = 0; i < nsinfo->num_queues; i++) {
 			ret_val = add_queue_to_list(&nsinfo->queue_list, nsinfo->queues[i]);
 			if (ret_val == 0) {
-				nsinfo->fairshare = NULL;
+				nsinfo->fairshares = NULL;
 				free_server(nsinfo, 1);
 				return NULL;
 			}
