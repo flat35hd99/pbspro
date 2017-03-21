@@ -3223,10 +3223,12 @@ create_pbs_node2(char *objname, svrattrl *plist, int perms, int *bad, struct pbs
 					(inet_pton(AF_INET6, realfirsthost, &(sa6.sin6_addr)) != 1))
 #endif
 			{
+#if 0
 				/* Not an IPv4 or IPv6 address, truncate it. */
 				pc = strchr(realfirsthost, '.');
 				if (pc)
 					*pc = '\0';
+#endif
 			}
 			rc = prdef->rs_decode(&presc->rs_value, "", "host", realfirsthost);
 			presc->rs_value.at_flags |= ATR_VFLAG_DEFLT; /* so not written to nodes file */
