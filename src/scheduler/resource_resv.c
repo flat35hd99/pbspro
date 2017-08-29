@@ -1925,12 +1925,22 @@ compare_res_to_str(schd_resource *res, char *str , enum resval_cmpflag cmpflag)
 
 	for (i = 0; res->str_avail[i] != NULL; i++) {
 		if (cmpflag == CMP_CASE) {
-			if (!strcmp(res->str_avail[i], str))
-				return 1;
+			if (str[0] == '^') {
+				if (strcmp(res->str_avail[i], str + 1))
+					return 1;
+			} else {
+				if (!strcmp(res->str_avail[i], str))
+					return 1;
+			}
 		}
 		else if (cmpflag == CMP_CASELESS) {
-			if (!strcasecmp(res->str_avail[i], str))
-				return 1;
+			if (str[0] == '^') {
+				if (strcasecmp(res->str_avail[i], str + 1))
+					return 1;
+			} else {
+				if (!strcasecmp(res->str_avail[i], str))
+					return 1;
+			}
 		}
 		else {
 			schdlog(PBSEVENT_DEBUG3, PBS_EVENTCLASS_JOB, LOG_NOTICE, res->name, "Incorrect flag for comparison.");
