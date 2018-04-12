@@ -50,11 +50,13 @@
 
 #define TJ_COST_MAX	10.0	/* Max CPU to spend searching for top jobs */
 /* Global NAS variables */
+#endif
 /* localmod 030 */
 int do_soft_cycle_interrupt;
 int do_hard_cycle_interrupt;
 int consecutive_interrupted_cycles = 0;
 time_t interrupted_cycle_start_time;
+#ifdef NAS
 /* localmod 038 */
 int num_topjobs_per_queues;      /* # of per_queues top jobs on the calendar */
 
@@ -3686,7 +3688,7 @@ job_filter_normal(resource_resv *resv, share_info *si)
  *=====================================================================
  */
 
-
+#endif
 /* start localmod 030 */
 /*
  *=====================================================================
@@ -3729,5 +3731,6 @@ check_for_cycle_interrupt(int do_logging)
 	return 0;
 }
 /* end localmod 030 */
+#ifdef NAS
 
 #endif /* NAS */
