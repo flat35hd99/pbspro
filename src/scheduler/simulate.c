@@ -107,9 +107,10 @@
 #include "globals.h"
 #include "check.h"
 #include "buckets.h"
-#ifdef NAS /* localmod 030 */
-#include "site_code.h"
-#endif /* localmod 030 */
+//#ifdef NAS /* localmod 030 */
+//#include "site_code.h"
+//#endif /* localmod 030 */
+extern int check_for_cycle_interrupt(int); /* localmod 030 */
 
 /** @struct	policy_change_func_name
  *
@@ -745,14 +746,14 @@ calc_run_time(char *name, server_info *sinfo, int flags)
 		if (ns == NULL) /* event can not run */
 			ret = simulate_events(sinfo->policy, sinfo, SIM_NEXT_EVENT, &(sinfo->opt_backfill_fuzzy_time), &event_time);
 
-#ifdef NAS /* localmod 030 */
+//#ifdef NAS /* localmod 030 */
 		if (check_for_cycle_interrupt(0)) {
 			break;
 		}
-#endif /* localmod 030 */
+//#endif /* localmod 030 */
 	} while (ns == NULL && !(ret & (TIMED_NOEVENT|TIMED_ERROR)));
 
-#ifdef NAS /* localmod 030 */
+#if 1 /* localmod 030 */
 	if (check_for_cycle_interrupt(0) || (ret & TIMED_ERROR)) {
 #else
 	if ((ret & TIMED_ERROR)) {

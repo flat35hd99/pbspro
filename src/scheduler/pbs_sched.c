@@ -141,10 +141,10 @@ time_t segv_start_time;
 time_t segv_last_time;
 struct tpp_config tpp_conf; /* global settings for tpp */
 
-#ifdef NAS /* localmod 030 */
+//#ifdef NAS /* localmod 030 */
 extern int do_soft_cycle_interrupt;
 extern int do_hard_cycle_interrupt;
-#endif /* localmod 030 */
+//#endif /* localmod 030 */
 
 static int	engage_authentication(struct connect_handle *);
 
@@ -450,7 +450,7 @@ restart(int sig)
 	schedule(SCH_CONFIGURE, -1, NULL);
 }
 
-#ifdef NAS /* localmod 030 */
+//#ifdef NAS /* localmod 030 */
 /**
  * @brief
  * 		make soft cycle interrupt active
@@ -473,7 +473,7 @@ hard_cycle_interrupt(int sig)
 {
 	do_hard_cycle_interrupt = 1;
 }
-#endif /* localmod 030 */
+//#endif /* localmod 030 */
 /**
  * @brief
  * 		log the bad connection message
@@ -1235,7 +1235,7 @@ main(int argc, char *argv[])
 	act.sa_handler = restart;       /* do a restart on SIGHUP */
 	sigaction(SIGHUP, &act, NULL);
 
-#ifdef NAS /* localmod 030 */
+//#ifdef NAS /* localmod 030 */
 	act.sa_handler = soft_cycle_interrupt; /* do a cycle interrupt on */
 					       /* SIGUSR1, subject to     */
 					       /* configurable parameters */
@@ -1243,7 +1243,7 @@ main(int argc, char *argv[])
 	act.sa_handler = hard_cycle_interrupt; /* do a cycle interrupt on */
 					       /* SIGUSR2                 */
 	sigaction(SIGUSR2, &act, NULL);
-#endif /* localmod 030 */
+//#endif /* localmod 030 */
 
 	act.sa_handler = die;           /* bite the biscuit for all following */
 	sigaction(SIGINT, &act, NULL);

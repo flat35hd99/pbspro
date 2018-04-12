@@ -119,6 +119,11 @@
 #ifdef NAS
 #include "site_code.h"
 #endif
+extern int check_for_cycle_interrupt(int);
+extern int do_soft_cycle_interrupt; /* localmod 030 */
+extern int do_hard_cycle_interrupt; /* localmod 030 */
+extern int consecutive_interrupted_cycles; /* localmod 030 */
+extern time_t interrupted_cycle_start_time; /* localmod 030 */
 
 /* a list of running jobs from the last scheduling cycle */
 static prev_job_info *last_running = NULL;
@@ -662,10 +667,10 @@ scheduling_cycle(int sd, char *jobid)
 
 	update_cycle_status(&cstat, 0);
 
-#ifdef NAS /* localmod 030 */
+//#ifdef NAS /* localmod 030 */
 	do_soft_cycle_interrupt = 0;
 	do_hard_cycle_interrupt = 0;
-#endif /* localmod 030 */
+//#endif /* localmod 030 */
 	/* create the server / queue / job / node structures */
 	if ((sinfo = query_server(&cstat, sd)) == NULL) {
 		schdlog(PBSEVENT_SYSTEM, PBS_EVENTCLASS_SERVER, LOG_NOTICE,
@@ -852,9 +857,9 @@ main_sched_loop(status *policy, int sd, server_info *sinfo, schd_error **rerr)
 	}
 
 	/* main scheduling loop */
-#ifdef NAS
 	/* localmod 030 */
 	interrupted_cycle_start_time = cycle_start_time;
+#ifdef NAS
 	/* localmod 038 */
 	num_topjobs_per_queues = 0;
 	/* localmod 064 */
@@ -865,11 +870,11 @@ main_sched_loop(status *policy, int sd, server_info *sinfo, schd_error **rerr)
 		int should_use_buckets;		/* Should use node buckets for a job */
 		unsigned int flags = NO_FLAGS;	/* flags to is_ok_to_run @see is_ok_to_run() */
 
-#ifdef NAS /* localmod 030 */
+//#ifdef NAS /* localmod 030 */
 		if (check_for_cycle_interrupt(1)) {
 			break;
 		}
-#endif /* localmod 030 */
+//#endif /* localmod 030 */
 
 		rc = 0;
 		comment[0] = '\0';
@@ -1096,14 +1101,14 @@ main_sched_loop(status *policy, int sd, server_info *sinfo, schd_error **rerr)
 			}
 		}
 
-#ifdef NAS /* localmod 030 */
+//#ifdef NAS /* localmod 030 */
 		if (check_for_cycle_interrupt(0)) {
 			consecutive_interrupted_cycles++;
 		}
 		else {
 			consecutive_interrupted_cycles = 0;
 		}
-#endif /* localmod 030 */
+//#endif /* localmod 030 */
 
 		/* send any attribute updates to server that we've collected */
 		send_job_updates(sd, njob);
