@@ -151,9 +151,11 @@ parse_config(char *fname)
 	conf.per_share_topjobs = 0;
 	/* localmod 038 */
 	conf.per_queues_topjobs = 0;
+#endif
 	/* localmod 030 */
 	conf.min_intrptd_cycle_length = 30;
 	conf.max_intrptd_cycles = 1;
+#ifdef NAS
 #endif
 
 	/* auto-set any internally needed config values before reading the file */
@@ -885,6 +887,7 @@ parse_config(char *fname)
 				else if (!strcmp(config_name, PARSE_PER_QUEUES_TOPJOBS)) {
 					conf.per_queues_topjobs = num;
 				}
+#endif
 				/* localmod 030 */
 				else if (!strcmp(config_name, PARSE_MIN_INTERRUPTED_CYCLE_LENGTH)) {
 					conf.min_intrptd_cycle_length = num;
@@ -892,6 +895,7 @@ parse_config(char *fname)
 				else if (!strcmp(config_name, PARSE_MAX_CONS_INTERRUPTED_CYCLES)) {
 					conf.max_intrptd_cycles = num;
 				}
+#ifdef NAS
 #endif
 				else
 					error = 1;
