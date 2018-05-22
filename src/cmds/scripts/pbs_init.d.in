@@ -401,7 +401,7 @@ start_pbs() {
 	      fi
 	   fi
 
-	   if  ${PBS_EXEC}/sbin/pbs_mom
+	   if  ${PBS_EXEC}/sbin/pbs_mom -p
            then
 	      echo "PBS mom"
            else
