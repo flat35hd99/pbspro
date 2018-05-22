@@ -555,6 +555,8 @@ query_jobs(status *policy, int pbs_sd, queue_info *qinfo, resource_resv **pjobs,
 	int i;
 	/* used for pbs_geterrmsg() */
 	char *errmsg;
+        
+        struct fairshare_head *fairshare;
 
 	/* Determine start, end, and duration */
 	resource_req *walltime_req = NULL;
@@ -620,7 +622,7 @@ query_jobs(status *policy, int pbs_sd, queue_info *qinfo, resource_resv **pjobs,
 
 	for (i = num_prev_jobs; cur_job != NULL; i++) {
 		char *selectspec = NULL;
-		if ((resresv = query_job(cur_job, qinfo->server, err)) ==NULL) {
+		if ((resresv = query_job(cur_job, qinfo->server, qinfo, err)) ==NULL) {
 			free_schd_error(err);
 			pbs_statfree(jobs);
 			free_resource_resv_array(resresv_arr);
@@ -807,9 +809,10 @@ query_jobs(status *policy, int pbs_sd, queue_info *qinfo, resource_resv **pjobs,
 		 * if it's 'queue' and if so, set the group info to the queue name
 		 */
 		if (!strcmp(conf.fairshare_ent, "queue")) {
-			if (resresv->server->fairshare !=NULL) {
+			if (resresv->server->fairshares !=NULL) {
+                                fairshare = get_fairshare_tree(resresv->job->queue->fairshare_tree, resresv->server->fairshares);
 				resresv->job->ginfo =
-					find_alloc_ginfo(qinfo->name, resresv->server->fairshare->root);
+					find_alloc_ginfo(qinfo->name, fairshare->root);
 			}
 			else
 				resresv->job->ginfo = NULL;
@@ -826,9 +829,10 @@ query_jobs(status *policy, int pbs_sd, queue_info *qinfo, resource_resv **pjobs,
 #else
 			sprintf(fairshare_name, "%s:%s", resresv->group, resresv->user);
 #endif /* localmod 058 */
-			if (resresv->server->fairshare !=NULL) {
+			if (resresv->server->fairshares !=NULL) {
+                                fairshare = get_fairshare_tree(resresv->job->queue->fairshare_tree, resresv->server->fairshares);
 				resresv->job->ginfo = find_alloc_ginfo(fairshare_name,
-					resresv->server->fairshare->root);
+					fairshare->root);
 			}
 			else
 				resresv->job->ginfo = NULL;
@@ -918,13 +922,14 @@ query_jobs(status *policy, int pbs_sd, queue_info *qinfo, resource_resv **pjobs,
  */
 
 resource_resv *
-query_job(struct batch_status *job, server_info *sinfo, schd_error *err)
+query_job(struct batch_status *job, server_info *sinfo, queue_info *qinfo, schd_error *err)
 {
 	resource_resv *resresv;		/* converted job */
 	struct attrl *attrp;		/* list of attributes returned from server */
 	int count;			/* int used in string->int conversion */
 	char *endp;			/* used for strtol() */
 	resource_req *resreq;		/* resource_req list for resources requested  */
+        struct fairshare_head *fairshare;
 
 	if ((resresv = new_resource_resv()) == NULL)
 		return NULL;
@@ -961,7 +966,7 @@ query_job(struct batch_status *job, server_info *sinfo, schd_error *err)
 	while (attrp != NULL && !resresv->is_invalid) {
 		clear_schd_error(err);
 		if (!strcmp(attrp->name, conf.fairshare_ent)) {
-			if (sinfo->fairshare != NULL) {
+			if (sinfo->fairshares != NULL) {
 #ifdef NAS /* localmod 059 */
 				/* This is a hack to allow -A specification for testing, but
 				 * ignore most incorrect user -A values
@@ -976,8 +981,9 @@ query_job(struct batch_status *job, server_info *sinfo, schd_error *err)
 						attrp->value);
 				}
 #else
+                                fairshare = get_fairshare_tree(qinfo->fairshare_tree, resresv->server->fairshares);
 				resresv->job->ginfo = find_alloc_ginfo(attrp->value,
-					sinfo->fairshare->root);
+					fairshare->root);
 #endif /* localmod 059 */
 			}
 			else
@@ -2531,6 +2537,8 @@ job_info *
 dup_job_info(job_info *ojinfo, queue_info *nqinfo, server_info *nsinfo)
 {
 	job_info *njinfo;
+        
+        struct fairshare_head *fairshare;
 
 	if ((njinfo = new_job_info()) == NULL)
 		return NULL;
@@ -2591,9 +2599,10 @@ dup_job_info(job_info *ojinfo, queue_info *nqinfo, server_info *nsinfo)
 	njinfo->resreleased = dup_nspecs(ojinfo->resreleased, nsinfo->nodes);
 	njinfo->resreq_rel = dup_resource_req_list(ojinfo->resreq_rel);
 
-	if (nqinfo->server->fairshare !=NULL) {
+	if (nqinfo->server->fairshares !=NULL) {
+                fairshare = get_fairshare_tree(ojinfo->queue->fairshare_tree, nqinfo->server->fairshares);
 		njinfo->ginfo = find_group_info(ojinfo->ginfo->name,
-			nqinfo->server->fairshare->root);
+			fairshare->root);
 	}
 	else
 		njinfo->ginfo = NULL;
