@@ -41,7 +41,7 @@
 %define pbs_execution execution
 %define pbs_server server
 %define pbs_version 18.1.0
-%define pbs_release 0
+%define pbs_release 2
 %define pbs_prefix /opt/pbs
 %define pbs_home /var/spool/pbs
 %define pbs_dbuser postgres
