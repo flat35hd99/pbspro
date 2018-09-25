@@ -146,6 +146,11 @@ strdup_escape(const char *str)
 				buf[i++] = 't';
 				str++;
 				break;
+			case '"':
+				buf[i++] = '\\';
+				buf[i++] = '"';
+				str++;
+				break;
 			default:
 				buf[i++] = *str++;
 			}
