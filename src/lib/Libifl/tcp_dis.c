@@ -361,8 +361,10 @@ static int raw_timed_read(int fd, char *buff, size_t max_size, int timeout_sec)
 		pollfds[0].revents = 0;
 
 		i = poll(pollfds, 1, timeout_sec * 1000);
-		if (i==0)
+		if (i == 0) {
+			errno = ETIMEDOUT;
 			return -1;
+		}
 		if (pbs_tcp_interrupt)
 			break;
 	} while ((i == -1) && (errno == EINTR));

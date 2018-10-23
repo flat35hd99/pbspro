@@ -78,7 +78,7 @@ cnt2server_extend(char *server, char *extend)
 
 #if defined(PBS_SECURITY) && (PBS_SECURITY == KRB5)
 	if (!getenv("PBSPRO_IGNORE_KERBEROS") && !pbsgss_can_get_creds()) {
-		fprintf(stderr, "No Kerberos credentials found. Set \"PBSPRO_IGNORE_KERBEROS\" environment variable to skip this check.\n");
+		fprintf(stderr, "No Kerberos credentials found.\n");
 		exit(1);
 	}
 #endif
