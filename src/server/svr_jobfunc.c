@@ -5673,8 +5673,7 @@ svr_setjob_histinfo(job *pjob, histjob_type type)
 	/* decrement the entity job counts and entity resource sums   */
 
 	if ((pjob->ji_qs.ji_state != JOB_STATE_MOVED) &&
-		(pjob->ji_qs.ji_state != JOB_STATE_FINISHED) &&
-		!(pjob->ji_qs.ji_svrflags & JOB_SVFLG_SubJob)) {
+		(pjob->ji_qs.ji_state != JOB_STATE_FINISHED)) {
 		int rc;
 		if ((rc=set_entity_ct_sum_max(pjob, NULL, DECR)) != 0) {
 			snprintf(log_buffer, LOG_BUF_SIZE-1, "set_entity_ct_sum_max on server failed with %d for finished job", rc);
