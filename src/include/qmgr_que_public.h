@@ -99,6 +99,7 @@ ATTR_queued_jobs_threshold,
 ATTR_queued_jobs_threshold_res,
 ATTR_backfill_depth,
 ATTR_comment,
+ATTR_fairshare_tree,
 #ifdef NAS
 /* localmod 046 */
 ATTR_maxstarve,
