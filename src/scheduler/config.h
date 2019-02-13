@@ -154,9 +154,11 @@
 /* localmod 038 */
 #define	PARSE_PER_QUEUES_TOPJOBS	"per_queues_topjobs"
 
+#endif
 /* localmod 030 */
 #define	PARSE_MIN_INTERRUPTED_CYCLE_LENGTH	"min_interrupted_cycle_length"
 #define	PARSE_MAX_CONS_INTERRUPTED_CYCLES	"max_cons_interrupted_cycles"
+#ifdef NAS
 #endif
 
 /* undocumented */
