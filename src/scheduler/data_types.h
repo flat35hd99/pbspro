@@ -1100,9 +1100,11 @@ struct config
 	int per_share_topjobs;		/* per share group guaranteed top jobs*/
 	/* localmod 038 */
 	int per_queues_topjobs;		/* per queues guaranteed top jobs */
+#endif
 	/* localmod 030 */
 	int min_intrptd_cycle_length;		/* min length of interrupted cycle */
 	int max_intrptd_cycles;		/* max consecutive interrupted cycles */
+#ifdef NAS
 #endif
 
 	/* selection criteria of nodes for provisioning */
