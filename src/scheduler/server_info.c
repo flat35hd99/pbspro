@@ -2587,6 +2587,9 @@ dup_selective_resource_list(schd_resource *res, resdef **deflist, unsigned flags
 	char neg[1027];
 
 	for (ares = allstrres; ares != NULL; ares = ares->next) {
+		if (resdef_exists_in_array(deflist, ares->def) == 0)
+			continue;
+
 		cur = find_resource(head, ares->def);
 		if (cur == NULL) {
 			nres = create_resource(ares->def->name, NULL, RF_NONE);
