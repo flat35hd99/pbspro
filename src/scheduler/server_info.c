@@ -1549,6 +1549,12 @@ add_resource_list(status *policy, schd_resource *r1, schd_resource *r2, unsigned
 	char neg[1027];
 
 	for (ares = allstrres; ares != NULL; ares = ares->next) {
+		if ((flags & USE_RESOURCE_LIST)) {
+			if (!resdef_exists_in_array((flags & NO_HOSTVNODE) ? policy->resdef_to_check_no_hostvnode : policy->resdef_to_check, ares->def) &&
+				!ares->def->type.is_boolean)
+				continue;
+		}
+
 		cur_r1 = find_resource(r1, ares->def);
 		if (cur_r1 == NULL) {
 			nres = create_resource(ares->def->name, NULL, RF_NONE);
@@ -2587,7 +2593,7 @@ dup_selective_resource_list(schd_resource *res, resdef **deflist, unsigned flags
 	char neg[1027];
 
 	for (ares = allstrres; ares != NULL; ares = ares->next) {
-		if (resdef_exists_in_array(deflist, ares->def) == 0)
+		if (!resdef_exists_in_array(deflist, ares->def))
 			continue;
 
 		cur = find_resource(head, ares->def);
