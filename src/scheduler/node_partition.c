@@ -701,7 +701,7 @@ node_partition_update(status *policy, node_partition *np)
 		if (np->res == NULL)
 			np->res = dup_selective_resource_list(np->ninfo_arr[i]->res,
 				policy->resdef_to_check_no_hostvnode, arl_flags);
-		else if (!add_resource_list(policy, np->res, np->ninfo_arr[i]->res, arl_flags)) {
+		else if (!add_resource_list(policy, np->res, np->ninfo_arr[i]->res, arl_flags | NO_HOSTVNODE)) {
 			rc = 0;
 			break;
 		}

@@ -1477,7 +1477,7 @@ add_resource_list(status *policy, schd_resource *r1, schd_resource *r2, unsigned
 
 	for (cur_r2 = r2; cur_r2 != NULL; cur_r2 = cur_r2->next) {
 		if ((flags & USE_RESOURCE_LIST)) {
-			if (!resdef_exists_in_array(policy->resdef_to_check, cur_r2->def) &&
+			if (!resdef_exists_in_array((flags & NO_HOSTVNODE) ? policy->resdef_to_check_no_hostvnode : policy->resdef_to_check, cur_r2->def) &&
 				!cur_r2->type.is_boolean)
 				continue;
 		}
