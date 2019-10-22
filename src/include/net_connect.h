@@ -203,10 +203,6 @@ void connection_init(void);
 char *build_addr_string(pbs_net_t);
 int set_nodelay(int fd);
 
-#if defined(PBS_SECURITY) && (PBS_SECURITY == KRB5)
-#include <gssapi.h>
-#endif
-
 struct connection {
 	int		cn_sock;	/* socket descriptor */
 	pbs_net_t	cn_addr;	/* internet address of client */
