@@ -205,6 +205,8 @@ char           *mom_home;
 char		mom_host[PBS_MAXHOSTNAME+1];
 pid_t		mom_pid;
 int		mom_run_state = 1;
+#define SAFE_STOP
+int		mom_safe_stop = 0;
 char		mom_short_name[PBS_MAXHOSTNAME+1];
 int		next_sample_time = MAX_CHECK_POLL_TIME;
 int		max_check_poll = MAX_CHECK_POLL_TIME;
@@ -675,6 +677,7 @@ extern  void    scan_for_terminated(void);
 /* Local public functions */
 
 void stop_me(int);
+void safe_stop(int);
 #endif
 
 extern	void	cleanup_hooks_workdir(struct work_task *);
@@ -9144,6 +9147,9 @@ main(int argc, char *argv[])
 	act.sa_handler = toolong;	/* handle an alarm call */
 	sigaction(SIGALRM, &act, NULL);
 
+	act.sa_handler = safe_stop;	/* shutdown only if no multinode jobs */
+	sigaction(SIGUSR1, &act, NULL);
+        
 	act.sa_handler = stop_me;	/* shutdown for these */
 	sigaction(SIGINT, &act, NULL);
 	sigaction(SIGTERM, &act, NULL);
@@ -9165,7 +9171,7 @@ main(int argc, char *argv[])
 	 **	that is exec'ed will not have SIG_IGN set for anything.
 	 */
 	sigaction(SIGPIPE, &act, NULL);
-	sigaction(SIGUSR1, &act, NULL);
+	/* sigaction(SIGUSR1, &act, NULL); */
 #ifdef	SIGINFO
 	sigaction(SIGINFO, &act, NULL);
 #endif
@@ -9816,6 +9822,10 @@ main(int argc, char *argv[])
 			process_hup();
 			internal_state_update = UPDATE_MOM_STATE;
 		}
+                
+		if (mom_safe_stop) {
+                    safe_stop(SIGUSR1);
+		}
 #endif
 
 		wait_time = default_next_task();
@@ -10234,6 +10244,22 @@ main(int argc, char *argv[])
 						PBS_EVENTCLASS_JOB, LOG_INFO,
 						pjob->ji_qs.ji_jobid, log_buffer);
 
+					kill_msg = malloc(80 + strlen(log_buffer) + \
+							strlen(pjob->ji_qs.ji_jobid) + \
+							strlen(pjob->ji_wattr[(int)JOB_ATR_job_owner].at_val.at_str) + \
+							strlen(mom_host) + \
+							strlen(pjob->ji_wattr[(int)JOB_ATR_jobname].at_val.at_str));
+					if (kill_msg != NULL) {
+						sprintf(kill_msg, "%s %s %s %s name: %s",
+							pjob->ji_qs.ji_jobid,
+							pjob->ji_wattr[(int)JOB_ATR_job_owner].at_val.at_str,
+							mom_host,
+							log_buffer,
+							pjob->ji_wattr[(int)JOB_ATR_jobname].at_val.at_str);
+						log_err(0, "RESOURCE_KILL", kill_msg);
+						free(kill_msg);
+					}
+
 					kill_msg = malloc(80 + strlen(log_buffer));
 					if (kill_msg != NULL) {
 						sprintf(kill_msg, "=>> PBS: job killed: %s\n", log_buffer);
@@ -10276,7 +10302,7 @@ main(int argc, char *argv[])
 
 	/* if kill_jobs_on_exit set, kill any running/suspended jobs */
 
-	if (kill_jobs_on_exit) {
+	if (kill_jobs_on_exit && recover != 2) {
 		pjob = (job *)GET_NEXT(svr_alljobs);
 		while (pjob) {
 			if (pjob->ji_qs.ji_substate == JOB_SUBSTATE_RUNNING
@@ -10286,6 +10312,14 @@ main(int argc, char *argv[])
 			else
 				term_job(pjob);
 
+			pjob = (job *)GET_NEXT(pjob->ji_alljobs);
+		}
+	} else {
+		/* full save running jobs on exit */
+		pjob = (job *)GET_NEXT(svr_alljobs);
+		while (pjob) {
+			if (pjob->ji_qs.ji_substate == JOB_SUBSTATE_RUNNING)
+				(void)job_save(pjob, SAVEJOB_FULL);
 			pjob = (job *)GET_NEXT(pjob->ji_alljobs);
 		}
 	}
@@ -10681,6 +10715,47 @@ stop_me(int sig)
 	mom_run_state = 0;
 	if (sig == SIGTERM)
 		kill_jobs_on_exit = 1;
+}
+
+/**
+ * @brief
+ *	signal handler for SIGUSR1
+ *	quit only if no multinode jobs on node
+ *	do not kill jobs on exit
+ *
+ * @param[in] sig - signal number
+ *
+ * @return 	Void
+ *
+ */
+
+void
+safe_stop(int sig)
+{
+        switch (sig) {
+		case SIGUSR1:
+			mom_run_state = 0;
+			mom_safe_stop = 1;
+			job *pjob;
+			for (pjob = (job *)GET_NEXT(svr_alljobs);
+				pjob;
+				pjob = (job *)GET_NEXT(pjob->ji_alljobs)) {
+				if (pjob->ji_qs.ji_state == JOB_STATE_RUNNING) {
+					if (pjob->ji_numnodes > 1) {
+						mom_run_state = 1;
+					} 
+				}
+
+				if (pjob->ji_qs.ji_state != JOB_STATE_RUNNING) {
+					mom_run_state = 1;
+				}
+			}                    
+			return;
+		default:
+			break;
+	}
+	
+
 }
 #endif	/* WIN32 */
 
