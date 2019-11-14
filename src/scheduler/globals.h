@@ -74,6 +74,7 @@ const struct enum_conv resind[RES_HIGH+1];
 extern resdef **allres;
 extern resdef **consres;
 extern resdef **boolres;
+extern schd_resource *allstrres;
 
 extern char *sc_name;
 extern int sched_port;
