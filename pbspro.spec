@@ -320,7 +320,7 @@ ${RPM_INSTALL_PREFIX:=%{pbs_prefix}}/libexec/pbs_postinstall server \
 	%{version} ${RPM_INSTALL_PREFIX:=%{pbs_prefix}} %{pbs_home} %{pbs_dbuser}
 fi
 if [ "$1" == "2" ]; then
-	service pbs restart
+	systemctl restart pbs
 fi
 
 %post %{pbs_execution}
