@@ -11975,8 +11975,6 @@ mom_topology(void)
 	} else {
 		close(fd[1]);
 
-		waitpid(pid, NULL, 0);
-
 		read(fd[0], &ret, sizeof(ret));
 		read(fd[0], &xmllen, sizeof(xmllen));
 		if ((xmlbuf = malloc(xmllen + 1)) == NULL) {
@@ -11987,6 +11985,8 @@ mom_topology(void)
 		read(fd[0], xmlbuf, xmllen);
 
 		close(fd[0]);
+
+		waitpid(pid, NULL, 0);
 	}
 
 	if (ret < 0) {
