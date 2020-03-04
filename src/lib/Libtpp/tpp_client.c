@@ -341,6 +341,8 @@ static int tpp_send_inner(int sd, void *data, int len, int full_len, int cmprsd_
 static int send_spl_packet(stream_t *strm, int type);
 static void flush_acks(stream_t *strm);
 static void tpp_clr_retry(tpp_packet_t *pkt, stream_t *strm);
+static void tpp_atfork_prepare(void);
+static void tpp_atfork_parent(void);
 
 /* externally called functions */
 int leaf_pkt_postsend_handler(int tfd, tpp_packet_t *pkt, void *extra);
@@ -796,7 +798,7 @@ tpp_init(struct tpp_config *cnf)
 
 #ifndef WIN32
 	/* for unix, set a pthread_atfork handler */
-	if (pthread_atfork(NULL, NULL, tpp_terminate) != 0) {
+	if (pthread_atfork(tpp_atfork_prepare, tpp_atfork_parent, tpp_terminate) != 0) {
 		tpp_log_func(LOG_CRIT, __func__, "TPP atfork handler registration failed");
 		return -1;
 	}
@@ -1564,6 +1566,24 @@ tpp_shutdown()
 	tpp_destroy_lock(&strmarray_lock);
 
 	free_routers();
+}
+
+static void
+tpp_atfork_prepare()
+{
+	if (tpp_child_terminated == 1)
+		return;
+
+	tpp_lock_fork();
+}
+
+static void
+tpp_atfork_parent()
+{
+	if (tpp_child_terminated == 1)
+		return;
+
+	tpp_unlock_fork();
 }
 
 /**

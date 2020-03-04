@@ -422,6 +422,8 @@ struct sockaddr_in* tpp_localaddr(int fd);
 struct sockaddr_in* tpp_getaddr(int tfd);
 void tpp_shutdown(void);
 void tpp_terminate(void);
+int tpp_lock_fork(void);
+int tpp_unlock_fork(void);
 int tpp_poll(void);
 char *tpp_parse_hostname(char *full, int *port);
 tpp_packet_t *tpp_cr_pkt(void *data, int len, int mk_data);
