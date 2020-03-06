@@ -910,8 +910,10 @@ send_job(job *jobp, pbs_net_t hostaddr, int port, int move_type,
 	struct attropl  *pqjatr;      /* list (single) of attropl for quejob */
 	char		 script_name[MAXPATHLEN+1];
 	struct work_task *ptask;
+#if 0
 	struct  hostent *hp;
 	struct in_addr   addr;
+#endif
 	long		 tempval;
 	int 		rpp = 0;
 
@@ -1002,6 +1004,7 @@ send_job(job *jobp, pbs_net_t hostaddr, int port, int move_type,
 			&credbuf, &credlen);
 	} else {
 #endif
+#if 0
 		addr.s_addr = htonl(hostaddr);
 		hp = gethostbyaddr((void *)&addr, sizeof(struct in_addr), AF_INET);
 		if (hp == NULL) {
@@ -1013,6 +1016,7 @@ send_job(job *jobp, pbs_net_t hostaddr, int port, int move_type,
 			(void)get_credential(hp->h_name, jobp, PBS_GC_BATREQ,
 				&credbuf, &credlen);
 		}
+#endif
 #ifdef WIN32
 	}
 #endif
