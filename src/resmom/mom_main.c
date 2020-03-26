@@ -6011,12 +6011,12 @@ bad_restrict(u_long ipadd)
   "STAGEFAIL", /* job held - file stage in failed */
   "SUBSTATE38",
   "SUBSTATE39",
-  "PRERUN",    /* job sent to MOM to run */
-  "STARTING",  /* final job start initiated */
-  "RUNNING",   /* job running */
-  "SUSPEND",   /* job suspended, CRAY only */
+  "SUBSTATE40",
+  "PRERUN",    /* job set to MOM to run */
+  "RUNNING",  /* job running */
+  "SUSPEND",   /* job suspended by client */
   "SUBSTATE44",
-  "SUBSTATE45",
+  "SCHSUSP",   /* job supsended by scheduler */
   "SUBSTATE46",
   "SUBSTATE47",
   "SUBSTATE48",
@@ -6027,17 +6027,106 @@ bad_restrict(u_long ipadd)
   "EXITED",    /* job exit processing completed   */
   "ABORT",     /* job is being aborted by server  */
   "SUBSTATE55",
-  "SUBSTATE56",
-  "PREOBIT",   /* preobit job status */
+  "KILLSIS",   /* (MOM) job kill IM to sisters    */
+  "RUNEPILOG",   /* (MOM) job epilogue running      */
   "OBIT",      /* (MOM) job obit notice sent */
-  "COMPLETED",
+  "TERM",      /* Job is in site termination stage */
   "RERUN",     /* job is rerun, recover output stage */
   "RERUN1",    /* job is rerun, stageout phase */
   "RERUN2",    /* job is rerun, delete files stage */
   "RERUN3",    /* job is rerun, mom delete job */
-  "RETSTD",    /* job has checkpoint file, return stdout / stderr files to server
-                * spool dir so that job can be restarted
-                */
+  "SUBSTATE64",
+  "SUBSTATE65",
+  "SUBSTATE66",
+  "SUBSTATE67",
+  "SUBSTATE68",
+  "EXPIRED",    /* subjob (of an array) is gone */
+  "BEGUN", /* Array job has begun */
+  "PROVISION", /* job is waiting for provisioning tocomplete */
+  "WAITING_JOIN_JOB", /* job waiting on IM_JOIN_JOB completion */
+  "SUBSTATE73",
+  "SUBSTATE74",
+  "SUBSTATE75",
+  "SUBSTATE76",
+  "SUBSTATE77",
+  "SUBSTATE78",
+  "SUBSTATE79",
+  "SUBSTATE80",
+  "SUBSTATE81",
+  "SUBSTATE82",
+  "SUBSTATE83",
+  "SUBSTATE84",
+  "SUBSTATE85",
+  "SUBSTATE86",
+  "SUBSTATE87",
+  "SUBSTATE88",
+  "SUBSTATE89",
+  "SUBSTATE90",
+  "TERMINATED",
+  "FINISHED",
+  "FAILED",
+  "MOVED",
+  "SUBSTATE95",
+  "SUBSTATE96",
+  "SUBSTATE97",
+  "SUBSTATE98",
+  "SUBSTATE99",
+  "SUBSTATE100",
+  "SUBSTATE101",
+  "SUBSTATE102",
+  "SUBSTATE103",
+  "SUBSTATE104",
+  "SUBSTATE105",
+  "SUBSTATE106",
+  "SUBSTATE107",
+  "SUBSTATE108",
+  "SUBSTATE109",
+  "SUBSTATE110",
+  "SUBSTATE111",
+  "SUBSTATE112",
+  "SUBSTATE113",
+  "SUBSTATE114",
+  "SUBSTATE115",
+  "SUBSTATE116",
+  "SUBSTATE117",
+  "SUBSTATE118",
+  "SUBSTATE119",
+  "SUBSTATE120",
+  "SUBSTATE121",
+  "SUBSTATE122",
+  "SUBSTATE123",
+  "SUBSTATE124",
+  "SUBSTATE125",
+  "SUBSTATE126",
+  "SUBSTATE127",
+  "SUBSTATE128",
+  "SUBSTATE129",
+  "SUBSTATE130",
+  "SUBSTATE131",
+  "SUBSTATE132",
+  "SUBSTATE133",
+  "SUBSTATE134",
+  "SUBSTATE135",
+  "SUBSTATE136",
+  "SUBSTATE137",
+  "SUBSTATE138",
+  "SUBSTATE139",
+  "SUBSTATE140",
+  "SUBSTATE141",
+  "SUBSTATE142",
+  "SUBSTATE143",
+  "SUBSTATE144",
+  "SUBSTATE145",
+  "SUBSTATE146",
+  "SUBSTATE147",
+  "SUBSTATE148",
+  "SUBSTATE149",
+  "SUBSTATE150",
+  "SUBSTATE151",
+  "SUBSTATE152",
+  "DELJOB", /* (MOM) Job del_job_wait to sisters  */
+  "SUBSTATE154",
+  "SUBSTATE155",
   NULL
   };
  
