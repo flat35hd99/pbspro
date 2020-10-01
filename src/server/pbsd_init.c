@@ -321,6 +321,8 @@ init_server_attrs()
 	snprintf(dflt_log_event, sizeof(dflt_log_event), "%d", SVR_LOG_DFLT);
 	set_attr_svr(&(server.sv_attr[(int)SRV_ATR_log_events]), &svr_attr_def[(int) SRV_ATR_log_events], dflt_log_event);
 
+	set_attr_svr(&(server.sv_attr[(int)SRV_ATR_mailer]), &svr_attr_def[(int) SRV_ATR_mailer], SENDMAIL_CMD);
+
 	set_attr_svr(&(server.sv_attr[(int)SRV_ATR_mailfrom]), &svr_attr_def[(int) SRV_ATR_mailfrom], PBS_DEFAULT_MAIL);
 
 	set_attr_svr(&(server.sv_attr[(int)SRV_ATR_query_others]), &svr_attr_def[(int) SRV_ATR_query_others], ATR_TRUE);

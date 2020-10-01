@@ -99,6 +99,7 @@ enum srv_atr {
 	SRV_ATR_operators,
 	SRV_ATR_dflt_que,
 	SRV_ATR_log_events,
+	SRV_ATR_mailer,
 	SRV_ATR_mailfrom,
 	SRV_ATR_query_others,
 	SRV_ATR_resource_avail,
