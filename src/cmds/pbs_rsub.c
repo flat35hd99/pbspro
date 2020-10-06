@@ -304,7 +304,7 @@ process_opts(int argc, char **argv, struct attrl **attrp, char *dest)
 				return (++errflg);
 			}
 
-			maintenance_hosts[num_hosts] = NULL;
+			maintenance_hosts[0] = NULL;
 
 			for (i = 0; optind < argc; optind++, i++) {
 				hostp = maintenance_hosts;
@@ -316,12 +316,11 @@ process_opts(int argc, char **argv, struct attrl **attrp, char *dest)
 				}
 
 				if (strlen(argv[optind]) == 0) {
-					num_hosts--;
 					i--;
-					maintenance_hosts[num_hosts] = NULL;
 					continue;
 				}
 
+				maintenance_hosts[i + 1] = NULL;
 				maintenance_hosts[i] = strdup(argv[optind]);
 				if (maintenance_hosts[i] == NULL) {
 					fprintf(stderr, "pbs_rsub: Out of memory\n");
