@@ -29,6 +29,7 @@ extern char *optarg;
 
 #define MAX_QUERY  128
 #define SHOW_NONE 0xff
+#define MAX_KILLED_LEN 256
 
 int log_mask;
 
@@ -38,6 +39,8 @@ char *DiagPtr  = "diag";
 
 char *Query[MAX_QUERY];
 int   QueryI   = 0;
+
+char *killed_ptr = "killed";
 
 char *FPtr     = NULL;
 char *JPtr     = NULL;
@@ -77,7 +80,7 @@ int main(
   char **ArgV)  /* I */
 
   {
-  const char *OptString = "c:Cd:f:h:p:q:r:sv";
+  const char *OptString = "c:Cd:f:h:p:q:r:k:sv";
 
   char  HostList[65536];
 
@@ -314,6 +317,54 @@ int main(
         CmdIndex = momShutdown;
 
         break;
+
+      case 'k':
+	/* pid killed */
+	/* FORMAT:  momctl -k <reason>:<PID|JOBID> */
+	CmdIndex = momQuery;
+
+	if ((Query[QueryI] = calloc(MAX_KILLED_LEN, sizeof(char))) == NULL) {
+		fprintf(stderr,"ERROR:    could not calloc %d bytes!\n",
+		(int)strlen(DiagPtr) + 3);
+
+		exit(EXIT_FAILURE);
+	}
+
+	if (optarg == NULL)
+		exit(EXIT_FAILURE);
+
+	snprintf(Query[QueryI], MAX_KILLED_LEN, "%s=%s", killed_ptr, optarg);
+	if (!strchr(optarg, ':')) {
+		fprintf(stderr, "ERROR: invalid format: '%s', requested format: '<reason>:<PID|JOBID>'\n", optarg);
+		exit(EXIT_FAILURE);
+	}
+
+	char *ptr = strchr(Query[QueryI], '=') + 1;
+	if (ptr == NULL) {
+		fprintf(stderr, "ERROR: invalid format: '%s', requested format: '<reason>:<PID|JOBID>'\n", optarg);
+		exit(EXIT_FAILURE);
+	}
+	ptr = strchr(ptr, ':') + 1;
+	if (ptr == NULL) {
+		fprintf(stderr, "ERROR: invalid format: '%s', requested format: '<reason>:<PID|JOBID>'\n", optarg);
+		exit(EXIT_FAILURE);
+	}
+	if (*ptr == '\0') {
+		fprintf(stderr, "ERROR: invalid format: '%s', requested format: '<reason>:<PID|JOBID>'\n", optarg);
+		exit(EXIT_FAILURE);
+	}
+	while (*ptr) {
+		if (!isdigit(*ptr) && *ptr != '.') {
+			fprintf(stderr, "ERROR: not a PID or JOBID: '%s'\n", optarg);
+			exit(EXIT_FAILURE);
+		}
+		if (*ptr == '.')
+			break;
+		ptr++;
+	}
+
+	QueryI++;
+	break;
 
       case 'v':
 
@@ -738,7 +789,8 @@ int do_mom(
           *ptr = '=';
           }
         }  /* END for (rindex) */
-        return (was_error);
+        if (was_error)
+	    return (was_error);
       }    /* END BLOCK (case momQuery) */
 
     break;

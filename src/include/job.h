@@ -550,6 +550,8 @@ struct job {
 	HANDLE		ji_momsubt;	/* process HANDLE to mom subtask */
 #else	/* not WIN32 */
 	pid_t		ji_momsubt;	/* pid of mom subtask   */
+	int ji_pids_size;
+	pid_t *ji_pids;
 #endif /* WIN32 */
 	/* ptr to post processing func  */
 	void	      (*ji_mompost)(struct job *, int);

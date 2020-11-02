@@ -5969,6 +5969,8 @@ bad_restrict(u_long ipadd)
 # define FAILURE 0
 #endif /* FAILURE */
 
+extern int job_pids_check_pid(job *pjob, pid_t pid);
+
  const char *PJobSubState[] =
   {
   "TRANSIN",                /* Transit in, wait for commit */
@@ -6527,6 +6529,155 @@ rm_request(int iochan, int version, int tcp)
                                       MUStrNCat(&BPtr, &BSpace, "jobs=");
                                       MUStrNCat(&BPtr, &BSpace, tmpLine);
 						
+                                    } else if (!strncasecmp(name, "killed", strlen("killed"))) {
+                                      char *ptr;
+				      char *reason = NULL;
+				      int pid;
+				      char *pos;
+				      char *jobid = NULL;
+				      job *pjob = NULL;
+				      enum reporttype {bypid, byjobid} reportedby;
+
+                                      BPtr = output;
+                                      BSpace = BUFSIZ;
+
+				      curr++; /* +1 for '=' */
+
+				      pos = strchr(curr, ':');
+				      if (pos == NULL || pos != strrchr(curr, ':'))
+					    goto bad;
+
+				      reason = strndup(curr, pos - curr);
+
+				      ptr = ++pos; /* +1 for ':' */
+
+				      reportedby = bypid;
+				      while (*pos != '\0') {
+					    if (!isdigit(*pos)) {
+						    reportedby = byjobid;
+						    break;
+					    }
+					    pos++;
+				      }
+
+				      switch (reportedby) {
+					    case bypid:
+						    pid = atoi(ptr);
+						    break;
+					    case byjobid:
+						    jobid = ptr;
+						    break;
+					    default:
+						goto bad;
+				      }
+
+				      if ((pjob = (job *)GET_NEXT(svr_alljobs)) != NULL) {
+						int kill_found = 0;
+						int c;
+						int i;
+						int fd;
+						u_long ipaddr;
+						while (pjob != NULL) {
+							switch (reportedby) {
+								case bypid:
+									if (pid = job_pids_check_pid(pjob, pid))
+										kill_found = true;
+									break;
+								case byjobid:
+									if (!strcmp(pjob->ji_qs.ji_jobid, jobid))
+										kill_found = true;
+									break;
+							}
+
+							if (kill_found) {
+								char *kill_msg;
+
+								sprintf(log_buffer, "%s - exceeded limit -", reason);
+
+								if (pjob->ji_qs.ji_substate == JOB_SUBSTATE_RUNNING) {
+									c = pjob->ji_qs.ji_svrflags;
+									kill_msg = malloc(25 + strlen(log_buffer));
+									if (kill_msg != NULL ) {
+										sprintf(kill_msg, "=>> PBS: job killed: %s\n", log_buffer);
+										if (c & JOB_SVFLG_HERE) {
+											message_job(pjob, StdErr, kill_msg);
+										} else {
+											/* Multi-mom scenario - adding a connection to demux for reporting error */
+
+											struct sockaddr_in *ap;
+											/* We always have a stream open to MS at node 0 */
+											i = pjob->ji_hosts[0].hn_stream;
+											if ((ap = rpp_getaddr(i)) == NULL) {
+												log_joberr(-1, "over_limit_message",
+													"cannot write to job stderr because there is no stream to MS",
+													pjob->ji_qs.ji_jobid);
+											} else {
+												ipaddr = ap->sin_addr.s_addr;
+												if ((fd = open_demux(ipaddr, pjob->ji_stderr)) == -1) {
+													(void)sprintf(log_buffer,
+														"over_limit_message: cannot write to job stderr because open_demux failed");
+													log_event(PBSEVENT_JOB | PBSEVENT_FORCE,
+														PBS_EVENTCLASS_JOB, LOG_INFO,
+														pjob->ji_qs.ji_jobid, log_buffer);
+												} else {
+													(void)write(fd, pjob->ji_wattr[(int)JOB_ATR_Cookie].at_val.at_str,
+													strlen(pjob->ji_wattr[(int)JOB_ATR_Cookie].at_val.at_str));
+													(void)write(fd, kill_msg, strlen(kill_msg));
+													(void)close(fd);
+												}
+											}
+										}
+										free(kill_msg);
+									}
+								}
+
+								kill_msg = malloc(80 + strlen(log_buffer) + \
+									strlen(pjob->ji_qs.ji_jobid) + \
+									strlen(pjob->ji_wattr[(int)JOB_ATR_job_owner].at_val.at_str) + \
+									strlen(mom_host) + \
+									strlen(pjob->ji_wattr[(int)JOB_ATR_jobname].at_val.at_str));
+								if (kill_msg != NULL) {
+									sprintf(kill_msg, "%s %s %s %s name: %s",
+										pjob->ji_qs.ji_jobid,
+										pjob->ji_wattr[(int)JOB_ATR_job_owner].at_val.at_str,
+										mom_host,
+										log_buffer,
+										pjob->ji_wattr[(int)JOB_ATR_jobname].at_val.at_str);
+									log_err(0, "RESOURCE_KILL", kill_msg);
+									free(kill_msg);
+								}
+
+								switch (reportedby) {
+									case bypid:
+										MUStrNCat(&BPtr, &BSpace, "PID reported");
+										break;
+									case byjobid:
+										MUStrNCat(&BPtr, &BSpace, "JOBID reported");
+										break;
+								}
+
+								break;
+							}
+
+							pjob = (job *)GET_NEXT(pjob->ji_alljobs);
+						}
+
+						if (!kill_found) {
+							switch (reportedby) {
+								case bypid:
+									MUStrNCat(&BPtr, &BSpace, "PID not found");
+									break;
+								case byjobid:
+									MUStrNCat(&BPtr, &BSpace, "JOBID not found");
+									break;
+							}
+						}
+				      } else {
+						MUStrNCat(&BPtr, &BSpace, "no running jobs");
+				      }
+
+				      free(reason);
+
                                     } else if (!strncasecmp(name, "users", strlen("users"))) {
                                       char *tmpLine;
                                       output[0] = '\0';

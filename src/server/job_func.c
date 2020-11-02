@@ -408,6 +408,8 @@ job_alloc(void)
 	pj->ji_mom_prot = PROT_INVALID; /* invalid protocol type */
 #if defined(PBS_MOM) && defined(WIN32)
 	pj->ji_momsubt = NULL;
+	pj->ji_pids_size = 0;
+	pj->ji_pids = NULL;
 #endif
 
 	/* set the working attributes to "unspecified" */

@@ -258,6 +258,11 @@ struct	config	dependent_config[] = {
 	{ NULL,		{ nullproc } },
 };
 
+void job_pids_add(job *pjob, pid_t pid);
+int job_pids_check_pid(job *pjob, pid_t pid);
+void job_pids_purge(job *pjob);
+void job_store_pids(job *pjob);
+
 #if	MOM_CPUSET
 
 #if	(CPUSET_VERSION < 4)
@@ -5825,6 +5830,8 @@ mom_set_use(job *pjob)
 		*lp_sz = MAX(*lp_sz, lnum_sz);
 	}
 
+	job_store_pids(pjob);
+
 	return (PBSE_NONE);
 }
 
@@ -8043,3 +8050,70 @@ pidcache_needed(void)
 }
 #endif	/* MOM_CPUSET */
 #endif	/* PBSMOM_HTUNIT */
+
+void
+job_pids_add(job *pjob, pid_t pid)
+{
+	int pid_num;
+	if (pjob->ji_pids_size == 0) {
+		pjob->ji_pids_size = TBL_INC + 1;
+		pjob->ji_pids = malloc(pjob->ji_pids_size * sizeof(pid_t));
+		pjob->ji_pids[0] = 0;
+	}
+
+	pid_num = 0;
+	while (pjob->ji_pids[pid_num] > 0)
+		pid_num++;
+
+	if (pid_num == pjob->ji_pids_size) {
+		pjob->ji_pids_size += TBL_INC;
+		pjob->ji_pids = realloc(pjob->ji_pids, pjob->ji_pids_size * sizeof(pid_t));
+	}
+
+	pjob->ji_pids[pid_num + 1] = 0;
+	pjob->ji_pids[pid_num] = pid;
+}
+
+int
+job_pids_check_pid(job *pjob, pid_t pid)
+{
+	int i;
+	for (i = 0; i < pjob->ji_pids_size; i++) {
+		if (pjob->ji_pids[i] == 0)
+			break;
+		if (pjob->ji_pids[i] == pid)
+			return pid;
+	}
+	return 0;
+}
+
+void
+job_pids_purge(job *pjob)
+{
+	int i;
+	if (pjob->ji_pids_size > 0) {
+		free(pjob->ji_pids);
+	}
+
+	pjob->ji_pids_size = 0;
+	pjob->ji_pids = NULL;
+}
+
+void
+job_store_pids(job *pjob)
+{
+	int		i;
+	proc_stat_t	*ps;
+
+	job_pids_purge(pjob);
+
+	for (i=0; i<nproc; i++) {
+
+		ps = &proc_info[i];
+
+		if (!injob(pjob, ps->session))
+			continue;
+
+		job_pids_add(pjob, ps->pid);
+	}
+}
