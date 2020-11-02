@@ -464,6 +464,7 @@ ${RPM_INSTALL_PREFIX:=%{pbs_prefix}}/libexec/pbs_posttrans \
 %else
 %exclude %{_unitdir}/pbs.service
 %endif
+%exclude %{pbs_prefix}/bin/mpiexec
 %exclude %{pbs_prefix}/bin/printjob_svr.bin
 %exclude %{pbs_prefix}/etc/pbs_db_schema.sql
 %exclude %{pbs_prefix}/libexec/pbs_schema_upgrade
