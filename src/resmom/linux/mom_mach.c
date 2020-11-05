@@ -8090,7 +8090,6 @@ job_pids_check_pid(job *pjob, pid_t pid)
 void
 job_pids_purge(job *pjob)
 {
-	int i;
 	if (pjob->ji_pids_size > 0) {
 		free(pjob->ji_pids);
 	}

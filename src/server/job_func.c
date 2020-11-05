@@ -392,6 +392,8 @@ job_alloc(void)
 	pj->ji_stdout = 0;
 	pj->ji_stderr = 0;
 	pj->ji_setup = NULL;
+	pj->ji_pids_size = 0;
+	pj->ji_pids = NULL;
 #else	/* SERVER */
 	pj->ji_prunreq = NULL;
 	pj->ji_pmt_preq = NULL;
@@ -408,8 +410,6 @@ job_alloc(void)
 	pj->ji_mom_prot = PROT_INVALID; /* invalid protocol type */
 #if defined(PBS_MOM) && defined(WIN32)
 	pj->ji_momsubt = NULL;
-	pj->ji_pids_size = 0;
-	pj->ji_pids = NULL;
 #endif
 
 	/* set the working attributes to "unspecified" */
@@ -612,6 +612,12 @@ job_free(job *pj)
 		pj->ji_hJob = NULL;
 	}
 #endif
+
+	if (pj->ji_pids_size > 0) {
+		free(pj->ji_pids);
+		pj->ji_pids = NULL;
+		pj->ji_pids_size = 0;
+	}
 
 #endif	/* PBS_MOM */
 	/* if a subjob (of a Array Job), do not free certain items */
