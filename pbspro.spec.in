@@ -332,6 +332,7 @@ sed -i '/\[Service\]/a StartLimitIntervalSec=0' %{_unitdir}/pbs.service
 sed -i '/\[Service\]/a StartLimitBurst=25' %{_unitdir}/pbs.service
 sed -i '/\[Service\]/a RestartSec=5' %{_unitdir}/pbs.service
 sed -i 's/Restart=.*/Restart=always/g' %{_unitdir}/pbs.service
+sed -i '/After=.*/s/$/ time-sync.target/' %{_unitdir}/pbs.service
 # do not run pbs_postinstall when the CLE is greater than or equal to 6
 imps=0
 cle_release_version=0
