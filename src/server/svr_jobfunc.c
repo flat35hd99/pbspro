@@ -5294,8 +5294,41 @@ update_job_finish_comment(job *pjob, int newsubstate, char *user)
 		snprintf(buffer, LOG_BUF_SIZE, "%s and finished",
 			pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
 	} else if (newsubstate == JOB_SUBSTATE_FAILED) {
-		snprintf(buffer, LOG_BUF_SIZE, "%s and failed",
-			pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
+		if ((pjob->ji_wattr[(int)JOB_ATR_exit_status].at_flags) & ATR_VFLAG_SET) {
+			switch (pjob->ji_wattr[(int)JOB_ATR_exit_status].at_val.at_long) {
+				case JOB_EXEC_KILL_NCPUS_BURST:
+					snprintf(buffer, LOG_BUF_SIZE, "%s and exceeded resource ncpus (burst)",
+						pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
+					break;
+				case JOB_EXEC_KILL_NCPUS_SUM:
+					snprintf(buffer, LOG_BUF_SIZE, "%s and exceeded resource ncpus (sum)",
+						pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
+					break;
+				case JOB_EXEC_KILL_VMEM:
+					snprintf(buffer, LOG_BUF_SIZE, "%s and exceeded resource vmem",
+						pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
+					break;
+				case JOB_EXEC_KILL_MEM:
+					snprintf(buffer, LOG_BUF_SIZE, "%s and exceeded resource mem",
+						pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
+					break;
+				case JOB_EXEC_KILL_CPUT:
+					snprintf(buffer, LOG_BUF_SIZE, "%s and exceeded resource cput",
+						pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
+					break;
+				case JOB_EXEC_KILL_WALLTIME:
+					snprintf(buffer, LOG_BUF_SIZE, "%s and exceeded resource walltime",
+						pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
+					break;
+				default:
+					snprintf(buffer, LOG_BUF_SIZE, "%s and failed",
+						pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
+					break;
+			}
+		} else {
+			snprintf(buffer, LOG_BUF_SIZE, "%s and failed",
+				pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str);
+		}
 	} else if (newsubstate == JOB_SUBSTATE_TERMINATED) {
 		/* Don't overwrite the comment; if already set by req_deletejob2 */
 		if (strstr(pjob->ji_wattr[(int)JOB_ATR_Comment].at_val.at_str, "terminated") == NULL) {
