@@ -6713,6 +6713,8 @@ rm_request(int iochan, int version, int tcp)
                                       //BSpace = sizeof(output);
                                       BSpace = BUFSIZ;
 
+                                      int BSize = BSpace;
+
                                       sprintf(tmpLine, "\nHost: %s/%s   Version: %s   PID: %ld\n",
                                         mom_short_name,
                                         mom_host,
@@ -7013,6 +7015,17 @@ rm_request(int iochan, int version, int tcp)
                                             PJobSubState[pjob->ji_qs.ji_substate],
                                             SIDList);
 
+					  if (BSpace < strlen(tmpLine) + 128) {
+					      BSize += BUFSIZ;
+					      BSpace += BUFSIZ;
+					      output = (char *)realloc(output, BSize);
+					      if (!output) {
+						log_err(errno, __func__, "realloc");
+						goto bad;
+					      }
+					      BPtr = output + strlen(output);
+					  }
+
                                           MUStrNCat(&BPtr, &BSpace, tmpLine);
 
                                           if (verbositylevel >= 4) {
@@ -7053,6 +7066,17 @@ rm_request(int iochan, int version, int tcp)
                                         while (pjob != NULL) {
                                           sprintf(tmpLine, "job[%s]  state=NEW\n",
                                             pjob->ji_qs.ji_jobid);
+
+					  if (BSpace < strlen(tmpLine) + 128) {
+					      BSize += BUFSIZ;
+					      BSpace += BUFSIZ;
+					      output = (char *)realloc(output, BSize);
+					      if (!output) {
+						log_err(errno, __func__, "realloc");
+						goto bad;
+					      }
+					      BPtr = output + strlen(output);
+					  }
 
                                           MUStrNCat(&BPtr, &BSpace, tmpLine);
 
