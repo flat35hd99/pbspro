@@ -120,6 +120,18 @@ parse_depend_item(char *depend_list, char **rtn_list, int *rtn_size)
 	char full_job_id[PBS_MAXCLTJOBID+1];
 	char server_out[PBS_MAXSERVERNAME + PBS_MAXPORTNUM + 2];
 
+	if (depend_list == NULL) {
+	    return 1;
+	}
+
+	if (strchr(depend_list, ':') == NULL) {
+	    return 1;
+	}
+
+	if (strlen(depend_list) <= 1 || depend_list[strlen(depend_list) - 1] == ':') {
+	    return 1;
+	}
+
 	/* Begin the parse */
 	c = depend_list;
 
