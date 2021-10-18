@@ -2353,7 +2353,7 @@ term_job(job *pjob)
  *
  */
 void
-im_eof(int stream, int ret)
+im_eof(int stream, int ret, int log_eod)
 {
 	int			num;
 	job			*pjob;
@@ -2361,15 +2361,21 @@ im_eof(int stream, int ret)
 	struct	sockaddr_in	*addr;
 
 	addr = rpp_getaddr(stream);
-	sprintf(log_buffer, "%s from addr %s on stream %d",
-		dis_emsg[ret], netaddr(addr), stream);
-	log_err(-1, __func__, log_buffer);
+
+	if (ret != DIS_EOD || log_eod) {
+		sprintf(log_buffer, "%s from addr %s on stream %d",
+			dis_emsg[ret], netaddr(addr), stream);
+		log_err(-1, __func__, log_buffer);
+	}
+
 	rpp_close(stream);
 
 	if (stream == server_stream) {
-		sprintf(log_buffer, "Server closed connection.");
-		log_event(PBSEVENT_SYSTEM, PBS_EVENTCLASS_SERVER, LOG_NOTICE,
-			__func__, log_buffer);
+		if (ret != DIS_EOD || log_eod) {
+			sprintf(log_buffer, "Server closed connection.");
+			log_event(PBSEVENT_SYSTEM, PBS_EVENTCLASS_SERVER, LOG_NOTICE,
+				__func__, log_buffer);
+		}
 		server_stream = -1;
 	}
 
@@ -3067,7 +3073,7 @@ im_request(int stream, int version)
 		sprintf(log_buffer, "bad connect from %s",
 			netaddr(addr));
 		log_err(-1, __func__, log_buffer);
-		im_eof(stream, 0);
+		im_eof(stream, 0, 1);
 		return;
 	}
 
@@ -5419,7 +5425,7 @@ err:
 		log_err(-1, __func__, log_buffer);
 	else
 		log_joberr(-1, __func__, log_buffer, jobid);
-	im_eof(stream, ret);
+	im_eof(stream, ret, 1);
 
 fini:
 	free(jobid);

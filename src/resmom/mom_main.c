@@ -7291,19 +7291,19 @@ do_rpp(int stream)
 	int			ret, proto, version;
 	void	im_request	(int stream, int version);
 	void	is_request	(int stream, int version);
-	void	im_eof		(int stream, int ret);
+	void	im_eof		(int stream, int ret, int log_eod);
 
 	DIS_rpp_reset();
 	proto = disrsi(stream, &ret);
 	if (ret != DIS_SUCCESS) {
-		im_eof(stream, ret);
+		im_eof(stream, ret, 0);
 		return;
 	}
 	version = disrsi(stream, &ret);
 	if (ret != DIS_SUCCESS) {
 		DBPRT(("%s: no protocol version number %s\n",
 			__func__, dis_emsg[ret]))
-		im_eof(stream, ret);
+		im_eof(stream, ret, 1);
 		return;
 	}
 
