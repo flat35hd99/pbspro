@@ -113,9 +113,9 @@
 #include	"globals.h"
 
 struct		connect_handle connection[NCONNECTS];
-int		connector;
+extern int		connector;
 int		server_sock;
-int		second_connection = -1;
+extern int		second_connection;
 
 #define		START_CLIENTS	2	/* minimum number of clients */
 #define		MAX_PORT_NUM 65535
@@ -131,10 +131,10 @@ char		usage[] =
 	"[-d home][-L logfile][-p file][-I schedname][-S port][-R port][-n][-N][-c clientsfile]";
 struct	sockaddr_in	saddr;
 sigset_t	allsigs;
-int		pbs_rm_port;
+extern int		pbs_rm_port;
 
 /* if we received a sigpipe, this probably means the server went away. */
-int		got_sigpipe = 0;
+extern int		got_sigpipe;
 
 /* used in segv restart */
 time_t segv_start_time;

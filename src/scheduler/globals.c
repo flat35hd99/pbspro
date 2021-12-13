@@ -143,9 +143,9 @@ struct status cstat;
 
 /* to make references happy */
 int pbs_rm_port;
-int got_sigpipe;
+int got_sigpipe = 0;
 
-int	second_connection;
+int second_connection = -1;
 
 /* resource definitions from the server */
 

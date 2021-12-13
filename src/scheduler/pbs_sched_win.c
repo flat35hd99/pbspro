@@ -924,7 +924,7 @@ main(int argc, char *argv[])
 	int             opt_no_restart = 0;
 	char	       *runjobid = NULL;
 	int		schedinit(void);
-	int		schedule(int com, int connector, char *runjid);
+	int		schedule(int com, int c, char *runjid);
 #ifdef _POSIX_MEMLOCK
 	int		do_mlockall = 0;
 #endif	/* _POSIX_MEMLOCK */

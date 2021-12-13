@@ -69,7 +69,7 @@ extern int pbs_rm_port;
 extern int got_sigpipe;
 
 /* static indexes into allres */
-const struct enum_conv resind[RES_HIGH+1];
+extern const struct enum_conv resind[RES_HIGH+1];
 
 extern resdef **allres;
 extern resdef **consres;

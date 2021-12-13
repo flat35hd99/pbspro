@@ -135,6 +135,7 @@ static int last_running_size = 0;
 extern void win_toolong(void);
 #endif
 
+int connector;
 extern int	second_connection;
 extern int	get_sched_cmd_noblk(int sock, int *val, char **jobid);
 
@@ -2713,7 +2714,7 @@ cleanup:
  *	Updates a set of attribute values of scheduler to the server and also does a status of this scheduler
  *	on server and fetches the updates of its attributes.
  *
- * @param[in] connector - socket descriptor to server
+ * @param[in] c - socket descriptor to server
  * @param[in] cmd     - scheduler command
  * @param[in] alarm_time  - value to be updated for scheduler cycle length.
  *
@@ -2728,7 +2729,7 @@ cleanup:
  *
  */
 int
-update_svr_schedobj(int connector, int cmd, int alarm_time)
+update_svr_schedobj(int c, int cmd, int alarm_time)
 {
 	char tempstr[128];
 	char port_str[MAX_INT_LEN];
@@ -2743,11 +2744,11 @@ update_svr_schedobj(int connector, int cmd, int alarm_time)
 	if (cmd == SCH_SCHEDULE_FIRST)
 		svr_knows_me = 0;
 
-	if ((cmd != SCH_SCHEDULE_NULL && cmd != SCH_ATTRS_CONFIGURE && svr_knows_me) || cmd == SCH_ERROR || connector < 0)
+	if ((cmd != SCH_SCHEDULE_NULL && cmd != SCH_ATTRS_CONFIGURE && svr_knows_me) || cmd == SCH_ERROR || c < 0)
 		return 1;
 
 	/* Stat the scheduler to get details of sched */
-	all_ss = pbs_statsched(connector, NULL, NULL);
+	all_ss = pbs_statsched(c, NULL, NULL);
 	ss = bs_find(all_ss, sc_name);
 
 	if (ss == NULL) {
@@ -2796,7 +2797,7 @@ update_svr_schedobj(int connector, int cmd, int alarm_time)
 	}
 	patt->next = NULL;
 
-	err = pbs_manager(connector,
+	err = pbs_manager(c,
 			  MGR_CMD_SET, MGR_OBJ_SCHED,
 			  sc_name, attribs, NULL);
 	if (err == 0)
