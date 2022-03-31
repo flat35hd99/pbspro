@@ -3392,7 +3392,7 @@ req_cpyfile(struct batch_request *preq)
 		}
 	} else {
 		if (stage_inout.bad_files) {
-			sprintf(log_buffer, "Job files not copied: %s", stage_inout.bad_list);
+			snprintf(log_buffer, sizeof(log_buffer), "Job files not copied: %s", stage_inout.bad_list);
 			log_event(PBSEVENT_DEBUG2, PBS_EVENTCLASS_JOB, LOG_DEBUG,
 					dup_rqcpf_jobid, log_buffer);
 		}
@@ -3546,7 +3546,7 @@ struct batch_request *preq;
 		if (!preq->isrpp) {
 			reply_text(preq, rc, bad_list);
 		} else {
-			sprintf(log_buffer, "Job files not deleted: %s", bad_list);
+			snprintf(log_buffer, sizeof(log_buffer), "Job files not deleted: %s", bad_list);
 			log_event(PBSEVENT_DEBUG2, PBS_EVENTCLASS_JOB, LOG_DEBUG,
 				preq->rq_ind.rq_cpyfile.rq_jobid, log_buffer);
 		}
