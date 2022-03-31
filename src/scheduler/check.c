@@ -1204,6 +1204,37 @@ check_avail_resources(schd_resource *reslist, resource_req *reqlist,
 				res = res->indirect_res;
 			}
 
+			if (res->type.is_atleast) {
+				avail = res->avail;
+
+				if (avail == SCHD_INFINITY_RES && (flags & UNSET_RES_ZERO))
+					avail = 0;
+
+				if (avail != SCHD_INFINITY_RES && resreq->amount != 0) {
+					if (avail < resreq->amount) {
+						fail = 1;
+						if (err != NULL) {
+							set_schd_error_codes(err, NOT_RUN, fail_code);
+							err->rdef = res->def;
+
+							res_to_str_r(resreq, RF_REQUEST, resbuf1, sizeof(resbuf1));
+							res_to_str_c(avail, res->def, RF_AVAIL, resbuf2, sizeof(resbuf2));
+							if ((flags & UNSET_RES_ZERO) && res->avail == SCHD_INFINITY_RES)
+								res_to_str_c(0, res->def, RF_AVAIL, resbuf3, sizeof(resbuf3));
+							else
+								res_to_str_r(res, RF_AVAIL, resbuf3, sizeof(resbuf3));
+							snprintf(buf, sizeof(buf), "(R: %s A: %s T: %s)", resbuf1, resbuf2, resbuf3);
+							set_schd_error_arg(err, ARG1, buf);
+
+						}
+					}
+					else {
+						cur_chunk = avail / resreq->amount;
+						if (cur_chunk < num_chunk || num_chunk == SCHD_INFINITY)
+							num_chunk = cur_chunk;
+					}
+				}
+			} else
 			if (res->type.is_non_consumable && !(flags & ONLY_COMP_CONS)) {
 				if (!compare_non_consumable(res, resreq)) {
 					fail = 1;
