@@ -1140,7 +1140,7 @@ mom_ping_need(mominfo_t *pmom, int force_hello, int once)
 	/* Query each vnode associated to the Mom */
 	for (nchild = 0; (nchild < psvrmom->msr_numvnds) && (do_ping==0); ++nchild) {
 		np = psvrmom->msr_children[nchild];
-		if (np->nd_state & (INUSE_OFFLINE|INUSE_OFFLINE_BY_MOM)) {
+		if (np->nd_state & (INUSE_OFFLINE)) {
 			if (force_hello) {
 				/* In the case where a mom is marked as "offline" */
 				/* and there was a restart (causing force_hello to */
