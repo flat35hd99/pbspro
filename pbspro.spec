@@ -45,7 +45,7 @@
 %endif
 
 %if !%{defined pbs_release}
-%define pbs_release 27
+%define pbs_release 28
 %endif
 
 %if !%{defined pbs_prefix}
