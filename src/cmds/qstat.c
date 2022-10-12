@@ -421,7 +421,7 @@ prt_attr(char *name, char *resource, char *value, int one_line) {
 					*buf++ = *value++;
 				}
 				*buf = '\0';
-				if (add_json_node(JSON_VALUE, JSON_NULL, JSON_ESCAPE, key, val) == NULL)
+				if (add_json_node(JSON_VALUE, JSON_NULL, JSON_FULLESCAPE, key, val) == NULL)
 					exit_qstat("out of memory");
 				if (*value != '\0')
 					value++;
@@ -443,7 +443,7 @@ prt_attr(char *name, char *resource, char *value, int one_line) {
 						exit_qstat("out of memory");
 					prev_resc_name = name;
 				}
-				if (add_json_node(JSON_VALUE, JSON_NULL, JSON_ESCAPE, resource, value)
+				if (add_json_node(JSON_VALUE, JSON_NULL, JSON_FULLESCAPE, resource, value)
 						== NULL)
 					exit_qstat("out of memory");
 			} else {
@@ -453,7 +453,7 @@ prt_attr(char *name, char *resource, char *value, int one_line) {
 						exit_qstat("out of memory");
 					prev_resc_name = NULL;
 				}
-				if (add_json_node(JSON_VALUE, JSON_NULL, JSON_ESCAPE, name, value) == NULL)
+				if (add_json_node(JSON_VALUE, JSON_NULL, JSON_FULLESCAPE, name, value) == NULL)
 					exit_qstat("out of memory");
 			}
 		}
