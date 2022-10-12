@@ -449,13 +449,13 @@ process_IS_CMD(int stream)
 	 */
 	msgid = disrst(stream, &rc);
 	if (!msgid || rc) {
-		close(stream);
+		rpp_close(stream);
 		return;
 	}
 
 	request = alloc_br(0); /* freed when reply sent */
 	if (!request) {
-		close(stream);
+		rpp_close(stream);
 		if (msgid)
 			free(msgid);
 		return;
@@ -469,7 +469,7 @@ process_IS_CMD(int stream)
 
 	rc = dis_request_read(stream, request);
 	if (rc != 0) {
-		close(stream);
+		rpp_close(stream);
 		free_br(request);
 		return;
 	}
