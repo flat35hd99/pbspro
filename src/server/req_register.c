@@ -438,6 +438,10 @@ post_doq(struct work_task *pwt)
 		(void)strcpy(log_buffer, msg_regrej);
 		(void)strcat(log_buffer, preq->rq_ind.rq_register.rq_parent);
 
+		char log_buffer_code[LOG_BUF_SIZE];
+		sprintf(log_buffer_code, " reply code=%d", preq->rq_reply.brp_code);
+		strcat(log_buffer, log_buffer_code);
+
 		log_event(PBSEVENT_JOB, PBS_EVENTCLASS_JOB, LOG_INFO,
 			jobid, log_buffer);
 		pjob = find_job(jobid);
