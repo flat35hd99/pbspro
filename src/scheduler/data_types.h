@@ -744,9 +744,6 @@ struct resource_type
 	unsigned is_float:1;
 	unsigned is_size:1;	/* all sizes are converted into kb */
 	unsigned is_time:1;
-
-	/* comparable resource - at least this value */
-	unsigned is_atleast:1;
 };
 
 struct schd_resource

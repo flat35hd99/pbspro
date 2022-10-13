@@ -184,9 +184,6 @@ query_resources(int pbs_sd)
 			else if (!strcmp(attrp->name, ATTR_RESC_FLAG)) {
 				def->flags = strtol(attrp->value, &endp, 10);
 			}
-			if (def->flags & ATR_DFLAG_ATLEAST) {
-				def->type.is_atleast = 1;
-			}
 			attrp = attrp->next;
 		}
 		for (j = 0; j < RES_HIGH; j++) {
