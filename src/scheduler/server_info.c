@@ -1547,6 +1547,8 @@ add_resource_list(status *policy, schd_resource *r1, schd_resource *r2, unsigned
 						add_resource_str_arr(cur_r1, cur_r2->str_avail, 0);
 				} else if (cur_r1->type.is_boolean)
 					(void)add_resource_bool(cur_r1, cur_r2);
+				if (cur_r1->type.is_atleast)
+					add_resource_atleast(cur_r1, cur_r2);
 			}
 		}
 	}
@@ -1727,6 +1729,24 @@ add_resource_bool(schd_resource *r1, schd_resource *r2)
 		r1->avail = TRUE_FALSE;
 	else if (!r1val && r2val)
 		r1->avail = TRUE_FALSE;
+
+	return 1;
+}
+
+int
+add_resource_atleast(schd_resource *r1, schd_resource *r2)
+{
+	int r1val, r2val;
+	if (r1 == NULL)
+		return 0;
+
+	if (!r1->type.is_atleast || (r2 != NULL && !r2->type.is_atleast))
+		return 0;
+
+
+	if (r2->avail > r1->avail) {
+		r1->avail = r2->avail;
+	}
 
 	return 1;
 }
@@ -3285,12 +3305,17 @@ set_resource(schd_resource *res, char *val, enum resource_fields field)
 			if (res->indirect_vnode_name == NULL)
 				return 0;
 		} else {
-			/* if the resource type is already set, clear it so we can set it here */
-			if (res->type.is_consumable != 0 || res->type.is_non_consumable !=0)
-				memset(&(res->type), 0, sizeof(struct resource_type));
-
+			/* atleast resource ca not be recognized by res_to_num() -> do not clear the type*/
+			if (res->type.is_atleast == 0) {
+				/* if the resource type is already set, clear it so we can set it here */
+				if (res->type.is_consumable != 0 || res->type.is_non_consumable !=0)
+					memset(&(res->type), 0, sizeof(struct resource_type));
+			}
 			/* if val is a string, avail will be set to SCHD_INFINITY_RES */
 			res->avail = res_to_num(val, &(res->type));
+			if (res->type.is_atleast) {
+				res->type.is_consumable = 0;
+			}
 			if (res->avail == SCHD_INFINITY_RES) {
 				/* Verify that this is a string type resource */
 				if (!res->def->type.is_string)
