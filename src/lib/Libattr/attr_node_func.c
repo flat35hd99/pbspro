@@ -1162,6 +1162,8 @@ return_external_value(char *name, char *val)
 
 	if (strcmp(name, ATTR_NODE_state) == 0) {
 		return vnode_state_to_str(atoi(val));
+	} else if (strcmp(name, ATTR_NODE_state_aux) == 0) {
+		return vnode_state_to_str(atoi(val));
 	} else if (strcmp(name, ATTR_NODE_Sharing) == 0) {
 		vns = vnode_sharing_to_str((enum vnode_sharing)atoi(val));
 		return (vns?vns:"");
@@ -1197,6 +1199,10 @@ return_internal_value(char *name, char *val)
 		return ("");
 
 	if (strcmp(name, ATTR_NODE_state) == 0) {
+		v=str_to_vnode_state(val);
+		sprintf(ret_str, "%d", v);
+		return (ret_str);
+	} else if (strcmp(name, ATTR_NODE_state_aux) == 0) {
 		v=str_to_vnode_state(val);
 		sprintf(ret_str, "%d", v);
 		return (ret_str);

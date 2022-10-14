@@ -81,6 +81,8 @@ void free_node_info(node_info *ninfo);
  */
 int set_node_info_state(node_info *ninfo, char *state);
 
+int set_node_info_state_aux(node_info *ninfo, char *state);
+
 /*
  *      remove_node_state
  */
@@ -90,6 +92,8 @@ int remove_node_state(node_info *ninfo, char *state);
  *      add_node_state
  */
 int add_node_state(node_info *ninfo, char *state);
+
+int add_node_state_aux(node_info *ninfo, char *state);
 
 /*
  *      talk_with_mom - talk to mom and get resources

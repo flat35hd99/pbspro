@@ -8360,6 +8360,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "ATTR_max_run_res_soft",SWIG_FromCharPtr("max_run_res_soft"));
   SWIG_Python_SetConstant(d, "ATTR_total",SWIG_FromCharPtr("total_jobs"));
   SWIG_Python_SetConstant(d, "ATTR_comment",SWIG_FromCharPtr("comment"));
+  SWIG_Python_SetConstant(d, "ATTR_comment_aux",SWIG_FromCharPtr("comment_aux"));
   SWIG_Python_SetConstant(d, "ATTR_cookie",SWIG_FromCharPtr("cookie"));
   SWIG_Python_SetConstant(d, "ATTR_qrank",SWIG_FromCharPtr("queue_rank"));
   SWIG_Python_SetConstant(d, "ATTR_altid",SWIG_FromCharPtr("alt_id"));
@@ -8523,6 +8524,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "ATTR_NODE_Mom",SWIG_FromCharPtr("Mom"));
   SWIG_Python_SetConstant(d, "ATTR_NODE_Port",SWIG_FromCharPtr("Port"));
   SWIG_Python_SetConstant(d, "ATTR_NODE_state",SWIG_FromCharPtr("state"));
+  SWIG_Python_SetConstant(d, "ATTR_NODE_state_aux",SWIG_FromCharPtr("state_aux"));
   SWIG_Python_SetConstant(d, "ATTR_NODE_ntype",SWIG_FromCharPtr("ntype"));
   SWIG_Python_SetConstant(d, "ATTR_NODE_jobs",SWIG_FromCharPtr("jobs"));
   SWIG_Python_SetConstant(d, "ATTR_NODE_resvs",SWIG_FromCharPtr("resv"));
