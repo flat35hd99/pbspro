@@ -201,6 +201,8 @@ def pbs_statobj(objtype, name=None, connect_server=None, filter_queue=None):
             if(objtype == "vnode"):
                 if(n == ATTR_NODE_state):
                     v = _pbs_v1.str_to_vnode_state(v)
+                elif(n == ATTR_NODE_state_aux):
+                    v = _pbs_v1.str_to_vnode_state(v)
                 elif(n == ATTR_NODE_ntype):
                     v = _pbs_v1.str_to_vnode_ntype(v)
                 elif(n == ATTR_NODE_Sharing):
@@ -1201,6 +1203,8 @@ class pbs_iter():
                         if(self.type == "vnodes"):
                             if(n == ATTR_NODE_state):
                                 v = _pbs_v1.str_to_vnode_state(v)
+                            elif(n == ATTR_NODE_state_aux):
+                                v = _pbs_v1.str_to_vnode_state(v)
                             elif(n == ATTR_NODE_ntype):
                                 v = _pbs_v1.str_to_vnode_ntype(v)
                             elif(n == ATTR_NODE_Sharing):
@@ -1342,6 +1346,8 @@ class pbs_iter():
 
                         if(self.type == "vnodes"):
                             if(n == ATTR_NODE_state):
+                                v = _pbs_v1.str_to_vnode_state(v)
+                            elif(n == ATTR_NODE_state_aux):
                                 v = _pbs_v1.str_to_vnode_state(v)
                             elif(n == ATTR_NODE_ntype):
                                 v = _pbs_v1.str_to_vnode_ntype(v)
