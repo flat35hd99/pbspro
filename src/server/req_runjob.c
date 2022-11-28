@@ -1244,6 +1244,9 @@ complete_running(job *jobp)
 	else
 		account_jobstr(jobp);
 
+	/* save finished job */
+	job_save(jobp, SAVEJOB_FULL);
+
 	/* if any dependencies, see if action required */
 
 	if (jobp->ji_wattr[(int)JOB_ATR_depend].at_flags&ATR_VFLAG_SET)
