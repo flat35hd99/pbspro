@@ -436,7 +436,7 @@ init_scheduling_cycle(status *policy, int pbs_sd, server_info *sinfo)
 			 */
 
 			for (i = 0; i < last_running_size ; i++) {
-				if (last_running[i].name != NULL) {
+				if (last_running[i].name != NULL && last_running[i].resused != NULL) {
 
 					if (sinfo->running_jobs != NULL)
 						for (j = 0; sinfo->running_jobs[j] != NULL &&
