@@ -221,8 +221,15 @@ query_queues(status *policy, int pbs_sd, server_info *sinfo)
 				qinfo->num_nodes = count_array((void **) qinfo->nodes);
 
 			} else if (qinfo->partition != NULL) {
-				qinfo->nodes_in_partition = node_filter(sinfo->nodes, sinfo->num_nodes,
+				node_info **all_nodes_in_partition = node_filter(sinfo->nodes, sinfo->num_nodes,
 						node_partition_cmp, (void *) qinfo->partition, 0);
+
+				qinfo->nodes_in_partition = node_filter(all_nodes_in_partition,
+					count_array((void **) all_nodes_in_partition), is_unassoc_node, NULL, 0);
+
+				if (all_nodes_in_partition != NULL)
+					free(all_nodes_in_partition);
+
 				qinfo->num_nodes = count_array((void **) qinfo->nodes_in_partition);
 			}
 
@@ -996,9 +1003,16 @@ dup_queue_info(queue_info *oqinfo, server_info *nsinfo)
 		nqinfo->nodes = node_filter(nsinfo->nodes, nsinfo->num_nodes,
 			node_queue_cmp, (void *) nqinfo->name, 0);
 
-	if (oqinfo->nodes_in_partition != NULL)
-		nqinfo->nodes_in_partition = node_filter(nsinfo->nodes, nsinfo->num_nodes,
+	if (oqinfo->nodes_in_partition != NULL) {
+		node_info **all_nodes_in_partition = node_filter(nsinfo->nodes, nsinfo->num_nodes,
 			node_partition_cmp, (void *) oqinfo->partition, 0);
+
+		nqinfo->nodes_in_partition = node_filter(all_nodes_in_partition,
+			count_array((void **) all_nodes_in_partition), is_unassoc_node, NULL, 0);
+
+		if (all_nodes_in_partition != NULL)
+			free(all_nodes_in_partition);
+	}
 
 	if (oqinfo->partition != NULL) {
 		nqinfo->partition = string_dup(oqinfo->partition);
