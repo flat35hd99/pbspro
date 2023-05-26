@@ -52,6 +52,9 @@
 
 #ifdef PYTHON
 
+#ifndef PY_SSIZE_T_CLEAN
+#define PY_SSIZE_T_CLEAN
+#endif
 #include <pbs_python_private.h> /* private python file  */
 #include <eval.h>               /* For PyEval_EvalCode  */
 #include <pythonrun.h>          /* For Py_SetPythonHome */

@@ -68,6 +68,11 @@ CLEANFILES = \
 
 pbs_ifl_wrap.c: $(top_srcdir)/src/lib/Libifl/pbs_ifl_wrap.c
 	echo '%module pbs_ifl' > pbs_ifl.i ; \
+	echo '%begin %{' >> pbs_ifl.i ; \
+	echo '#ifndef PY_SSIZE_T_CLEAN' >> pbs_ifl.i ; \
+	echo '#define PY_SSIZE_T_CLEAN' >> pbs_ifl.i ; \
+	echo '#endif' >> pbs_ifl.i ; \
+	echo '%}' >> pbs_ifl.i ; \
 	echo '%{' >> pbs_ifl.i ; \
 	echo '#include "pbs_ifl.h"' >> pbs_ifl.i ; \
 	echo '%}' >> pbs_ifl.i ; \
