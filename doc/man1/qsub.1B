@@ -164,7 +164,8 @@ For example:
 .B qsub -S /bin/bash myscript.sh
 .RE
 
-In the first line of your script.  For example:
+You can change the shell in the first line of your script. This way
+the changed shell will be started within your login shell. For example:
 .RS 3
 .nf
 .B cat myscript.sh
