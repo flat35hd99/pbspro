@@ -54,7 +54,7 @@ CREATE TABLE pbs.info (
     pbs_schema_version TEXT 		NOT NULL
 );
 
-INSERT INTO pbs.info values('1.4.0'); /* schema version */
+INSERT INTO pbs.info values('1.4.1'); /* schema version */
 
 ---------------------- SERVER ------------------------------
 
@@ -189,7 +189,7 @@ CREATE TABLE pbs.job (
     ji_4jid		TEXT,
     ji_4ash		TEXT,
     ji_credtype		INTEGER,
-    ji_qrank		INTEGER		NOT NULL,
+    ji_qrank		BIGINT		NOT NULL,
     ji_savetm		TIMESTAMP	NOT NULL,
     ji_creattm		TIMESTAMP	NOT NULL,
     attributes		hstore		NOT NULL default '',

@@ -377,7 +377,7 @@ load_job(const  PGresult *res, pbs_db_job_info_t *pj, int row)
 	GET_PARAM_STR(res, row, pj->ji_4jid, ji_4jid_fnum);
 	GET_PARAM_STR(res, row, pj->ji_4ash, ji_4ash_fnum);
 	GET_PARAM_INTEGER(res, row, pj->ji_credtype, ji_credtype_fnum);
-	GET_PARAM_INTEGER(res, row, pj->ji_qrank, ji_qrank_fnum);
+	GET_PARAM_BIGINT(res, row, pj->ji_qrank, ji_qrank_fnum);
 	GET_PARAM_BIGINT(res, row, pj->ji_savetm, ji_savetm_fnum);
 	GET_PARAM_BIGINT(res, row, pj->ji_creattm, ji_creattm_fnum);
 	GET_PARAM_BIN(res, row, raw_array, attributes_fnum);
@@ -431,7 +431,7 @@ pg_db_save_job(pbs_db_conn_t *conn, pbs_db_obj_info_t *obj, int savetype)
 	SET_PARAM_STR(conn, pjob->ji_4jid, 19);
 	SET_PARAM_STR(conn, pjob->ji_4ash, 20);
 	SET_PARAM_INTEGER(conn, pjob->ji_credtype, 21);
-	SET_PARAM_INTEGER(conn, pjob->ji_qrank, 22);
+	SET_PARAM_BIGINT(conn, pjob->ji_qrank, 22);
 
 	if (savetype == PBS_UPDATE_DB_QUICK) {
 		params = 23;
