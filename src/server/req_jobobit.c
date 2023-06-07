@@ -1899,7 +1899,7 @@ job_obit(struct resc_used_update *pruu, int stream)
 	if (((local_exitstatus == JOB_EXEC_HOOK_RERUN) ||
 		(local_exitstatus == JOB_EXEC_HOOK_DELETE)) &&
 		(exitstatus != JOB_EXEC_FAILHOOK_RERUN)  &&
-		(exitstatus != JOB_EXEC_FAILHOOK_DELETE)) {
+		(exitstatus != JOB_EXEC_FAILHOOK_DELETE) && exitstatus < 0) {
 		exitstatus = local_exitstatus;
 	} else {
 
