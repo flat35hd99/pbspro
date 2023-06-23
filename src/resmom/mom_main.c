@@ -10154,10 +10154,21 @@ main(int argc, char *argv[])
 	if (stalone != 1) {
 		mom_lock(lockfds, F_UNLCK);	/* unlock so child can relock */
 
-		if (fork() > 0)
+		if (fork() > 0) {
+			sigset_t waitset;
+			int sigfromchild;
+			sigemptyset(&waitset);
+			sigaddset(&waitset, SIGUSR1);
+			sigprocmask(SIG_BLOCK, &waitset, NULL);
+
+			/* wait for child to write the pid file */
+			sigwait(&waitset, &sigfromchild);
 			return (0);	/* parent goes away */
+		}
 
 		if (setsid() == -1) {
+			kill(getppid(), SIGUSR1); // tell parent to exit
+
 			log_err(errno, msg_daemonname, "setsid failed");
 			return (2);
 		}
@@ -10202,6 +10213,11 @@ main(int argc, char *argv[])
 		}
 	}
 #endif	/* _POSIX_MEMLOCK */
+
+#ifndef	DEBUG
+	if (stalone != 1)
+		kill(getppid(), SIGUSR1); // tell parent pid is written
+#endif	/* DEBUG */
 
 	sigemptyset(&allsigs);
 	sigaddset(&allsigs, SIGHUP);	/* remember to block these */
