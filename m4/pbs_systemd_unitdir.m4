@@ -42,7 +42,7 @@
 AC_DEFUN([PBS_AC_SYSTEMD_UNITDIR],
 [
   AC_MSG_CHECKING([system/machine type for systemd unit dir])
-  systemd_dir="/usr/lib/systemd/system"
+  systemd_dir="/home/users/wataru/usr/lib/systemd/system"
   AS_IF([test -r "/etc/os-release"],
     [system_type=$( cat /etc/os-release | awk -F'=' '/^ID=/' | cut -d "=" -f 2 )
       AS_IF([test "x$system_type" = "xubuntu" -o "x$system_type" = "xdebian"],
