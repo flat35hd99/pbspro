@@ -66,7 +66,7 @@ dist_pythonlib_PYTHON = \
 	pbs_bootcheck.py \
 	pbs_topologyinfo.py
 
-sysprofiledir = /etc/profile.d
+sysprofiledir = /home/users/wataru/etc/profile.d
 
 dist_sysprofile_DATA = \
 	pbs.csh \
